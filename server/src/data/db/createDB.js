@@ -7,6 +7,7 @@ const postgresClient = new Client({
   password: "123",
   port: 5432,
 });
+
 const matchaClient = new Client({
   host: "localhost",
   user: "mel-hamr",
@@ -43,7 +44,6 @@ const createTables = async () => {
     return false;
   }
 };
-
 
 module.exports = {
   createDatabase,createTables,matchaClient
