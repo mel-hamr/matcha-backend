@@ -18,7 +18,7 @@ const createRecord = async (user, table, res) => {
         return dota.rows[0];
     } catch (e) {
         console.log(`error from create record ${table} :`, e.message);
-        res.status(400).send(e.message);
+        throw e;
     }
 };
 
@@ -38,7 +38,7 @@ async function getRecordBy(table, columnName, columnValue, res) {
     const query = `SELECT * FROM ${table} WHERE ${columnName} = $1`;
     if (!matchaClient._connected) matchaClient.connect().catch((e) => {});
     let result = await matchaClient.query(query, [columnValue]).catch((e) => {
-        res.status(400).send(e.message);
+        throw e;
     });
     return result.rows[0];
 }
@@ -52,7 +52,7 @@ const updateRecord = async (table, id, updateObject, res) => {
     const query = `UPDATE ${table} SET ${setClause} WHERE id = $1 RETURNING *`;
     if (!matchaClient._connected) matchaClient.connect();
     let result = await matchaClient.query(query, [id, ...values]).catch((e) => {
-        res.status(400).send(e.message);
+        throw e;
     });
     return result.rows[0];
 };
@@ -62,7 +62,7 @@ async function deleteRecord(table, id, res) {
     const query = `DELETE FROM ${table} WHERE id = $1 RETURNING *`;
     if (!matchaClient._connected) matchaClient.connect().catch((e) => {});
     let result = await matchaClient.query(query, [id]).catch((e) => {
-        res.status(400).send(e.message);
+        throw e;
     });
     return result.rows[0];
 }

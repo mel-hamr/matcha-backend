@@ -36,12 +36,17 @@ app.get("/start/intiate", async (req, res) => {
     res.status(200).send("data base created succsesfully");
 });
 
+app.get("/messages", async (req, res) => {
+    const messages = await chatService.getMessages();
+    res.status(200).send(messages);
+});
+
 io.on("connection", (socket) => {
+    let err;
     socket.join(socket.handshake.query.roomID.toString());
 
     socket.on("sendFriendMessage", (message) => {
-        chatService.sendMessage(message);
-        console.log(message.receiver_id);
+        chatService.sendMessage(message, err);
         socket
             .to(message.sender_id.toString())
             .to(message.receiver_id.toString())
