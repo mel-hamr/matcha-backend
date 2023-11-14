@@ -3,11 +3,13 @@ const crud = require("./data/db/crud");
 const dataBase = require("./data/db/createDB");
 // const userRouter =require('./src/routes/user/route')
 var bodyParser = require("body-parser");
+var cors = require("cors");
 
 const app = express();
 const port = 3000;
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cors());
 
 const httpServer = require("http").createServer(app);
 
@@ -21,7 +23,6 @@ const io = require("socket.io")(httpServer, {
 
 app.get("/", (req, res) => {
     res.send("hello world");
-    console.log("hello world");
 });
 
 app.post("/add", (req, res, data) => {
@@ -31,7 +32,7 @@ app.post("/add", (req, res, data) => {
 app.post("/update", crud.updateRecord);
 
 app.get("/start/intiate", async (req, res) => {
-    // await dataBase.createDatabase();
+    await dataBase.createDatabase();
     await dataBase.createTables();
     res.status(200).send("data base created succsesfully");
 });
@@ -39,6 +40,13 @@ app.get("/start/intiate", async (req, res) => {
 app.get("/messages", async (req, res) => {
     const messages = await chatService.getMessages();
     res.status(200).send(messages);
+});
+
+app.get("/conversations", async (req, res) => {
+    const userID = req.query.userID;
+    console.log("room", userID);
+    const conversations = await chatService.getConversations(userID);
+    res.status(200).send(conversations);
 });
 
 io.on("connection", (socket) => {

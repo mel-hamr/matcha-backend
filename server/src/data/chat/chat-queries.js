@@ -6,7 +6,11 @@ const {
     getRecordById,
     getRecordBy,
 } = require("../db/crud");
-const { getConversationQuery } = require("../chat/queries");
+const {
+    getConversationQuery,
+    getConversationsQuery,
+    getUserConversationsQuery,
+} = require("../chat/queries");
 const client = require("../db/createDB");
 const matchaClient = client.matchaClient;
 
@@ -47,13 +51,18 @@ const saveMessage = async (message) => {
     return await createRecord(msg, "message");
 };
 
-const getConversation = async (data) => {
-    const messages = await getRecordById("conversation", data.cnvId);
-    return messages;
+const getConversations = async (userID) => {
+    if (!matchaClient._connected) matchaClient.connect().catch((e) => {});
+
+    const conversations = await matchaClient.query(getUserConversationsQuery, [
+        userID,
+    ]);
+    console.log("conversation", conversations.rows);
+    return conversations.rows;
 };
 
 module.exports = {
     saveConvertaion,
     saveMessage,
-    getConversation,
+    getConversations,
 };

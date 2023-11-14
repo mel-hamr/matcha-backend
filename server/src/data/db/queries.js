@@ -44,6 +44,7 @@ const createTable = `
     participant_a INT REFERENCES users(id),
     participant_b INT REFERENCES users(id),
     last_message VARCHAR(255),
+    date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     is_read BOOLEAN
   );
   CREATE TABLE IF NOT EXISTS message (
