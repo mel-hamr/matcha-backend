@@ -51,8 +51,19 @@ const saveMessage = async (message) => {
     return await createRecord(msg, "message");
 };
 
+const getConversation = async (userID) => {
+    if (!matchaClient._connected) matchaClient.connect();
+
+    const conversations = await matchaClient.query(getUserConversationsQuery, [
+        userID,
+    ]);
+    console.log("conversation", conversations.rows);
+    return conversations.rows[0];
+};
+
+
 const getConversations = async (userID) => {
-    if (!matchaClient._connected) matchaClient.connect().catch((e) => {});
+    if (!matchaClient._connected) matchaClient.connect();
 
     const conversations = await matchaClient.query(getUserConversationsQuery, [
         userID,
