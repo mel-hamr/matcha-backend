@@ -50,7 +50,7 @@ const createTable = `
   CREATE TABLE IF NOT EXISTS message (
     id SERIAL PRIMARY KEY,
     conversation_id INT REFERENCES conversation(id),
-    sender varchar(255),
+    sender_id INT REFERENCES users(id),
     text varchar(255),
     date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   );

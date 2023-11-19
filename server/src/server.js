@@ -38,13 +38,20 @@ app.get("/start/intiate", async (req, res) => {
 });
 
 app.get("/messages", async (req, res) => {
-    const messages = await chatService.getMessages();
+    const cnvId = req.query.cnvId;
+    const messages = await chatService.getMessages(cnvId);
     res.status(200).send(messages);
 });
 
+// app.get("/sendMessage", async (req, res) => {
+//     console.log(req.body);
+//     // chatService.sendMessage()
+//     res.send(200).send('sent')
+// })
+
 app.get("/conversations", async (req, res) => {
     const userID = req.query.userID;
-    console.log("room", userID);
+    // console.log("room", userID);
     const conversations = await chatService.getConversations(userID);
     res.status(200).send(conversations);
 });
@@ -54,11 +61,18 @@ io.on("connection", (socket) => {
     socket.join(socket.handshake.query.roomID.toString());
 
     socket.on("sendFriendMessage", (message) => {
-        chatService.sendMessage(message, err);
-        socket
-            .to(message.sender_id.toString())
-            .to(message.receiver_id.toString())
-            .emit("receiveFriendMessage", message);
+        console.log("sender", message);
+        if (
+            message.sender_id !== undefined &&
+            message.receiver_id !== undefined &&
+            message.message !== undefined
+        ) {
+            chatService.sendMessage(message, err);
+            socket
+                .to(message.sender_id.toString())
+                .to(message.receiver_id.toString())
+                .emit("receiveFriendMessage", message);
+        }
     });
 
     socket.on("disconnect", () => {
