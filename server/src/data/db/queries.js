@@ -39,10 +39,25 @@ const createTable = `
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     expires_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP + INTERVAL '1 day'
   );
+  CREATE TABLE IF NOT EXISTS "conversation" (
+    id SERIAL PRIMARY KEY,
+    participant_a INT REFERENCES users(id),
+    participant_b INT REFERENCES users(id),
+    last_message VARCHAR(255),
+    date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    is_read BOOLEAN
+  );
+  CREATE TABLE IF NOT EXISTS message (
+    id SERIAL PRIMARY KEY,
+    conversation_id INT REFERENCES conversation(id),
+    sender varchar(255),
+    text varchar(255),
+    date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  );
 `;
 
 module.exports = {
-  checkDbExist,
-  createDb,
-  createTable,
+    checkDbExist,
+    createDb,
+    createTable,
 };
