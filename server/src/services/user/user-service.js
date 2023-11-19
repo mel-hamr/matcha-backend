@@ -8,17 +8,20 @@ const axios = require("axios");
 const userSignIn = async (userWo, res) => {
   let newUser;
   let user;
-  user = await userRepo.getUserByUsernameOrEmail(userWo.username,userWo.email_address);
+  user = await userRepo.getUserByUsernameOrEmail(
+    userWo.username,
+    userWo.email_address
+  );
   if (user) {
-    if(user.email_address == userWo.email_address)
+    if (user.email_address == userWo.email_address)
       res.status(400).send("email address already used");
-    else if(user.username == userWo.username)
-        res.status(400).send("username already used");
-    return
+    else if (user.username == userWo.username)
+      res.status(400).send("username already used");
+    return;
   }
 
-  if(!userWo.lantiude && !userWo.longitude){
-    const firstResponse = await axios.get('https://httpbin.org/ip');
+  if (!userWo.lantiude && !userWo.longitude) {
+    const firstResponse = await axios.get("https://httpbin.org/ip");
     const publicIpAddress = firstResponse.data.origin;
     const response = await fetch(`http://ip-api.com/json/${publicIpAddress}`);
     data = await response.json();
@@ -29,7 +32,7 @@ const userSignIn = async (userWo, res) => {
   if (newUser) {
     console.log("====================================");
     console.log(newUser);
-    
+
     // let accessToken = auth.signJWT(
     //   {
     //     username: userWo.username,
@@ -56,12 +59,12 @@ const userSignIn = async (userWo, res) => {
     //   maxAge: 60 * 60 * 24 * 1000, // 1 year
     //   httpOnly: true,
     // });
-    verifocationEmailHelper.sendVerificationEmail(newUser, res);  
-    res.status(200).send({ message: "user created successfully"});
+    verifocationEmailHelper.sendVerificationEmail(newUser, res);
+    res.status(200).send({ message: "user created successfully" });
     // res.redirect('http://localhost:4200')
   } else {
     res.status(400).send("error happend while creating user");
-    return
+    return;
   }
 };
 
@@ -69,7 +72,7 @@ const verifyUserEmail = async (userId, uniqueString, res) => {
   let user_verification = await generalCrude.getRecordBy(
     "user_verification",
     "user_id",
-    userId,
+    userId
   );
   // check if user verification record exists
   if (user_verification) {
@@ -86,13 +89,9 @@ const verifyUserEmail = async (userId, uniqueString, res) => {
         .compare(uniqueString, user_verification.unique_string)
         .then((result) => {
           if (result) {
-            generalCrude.updateRecord(
-              "users",
-              userId,
-              {
-                verified: true,
-              }
-            );
+            generalCrude.updateRecord("users", userId, {
+              verified: true,
+            });
             generalCrude.deleteRecord(
               "user_verification",
               user_verification.id
