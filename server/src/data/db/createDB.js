@@ -1,4 +1,4 @@
-const { Client } = require("pg");
+const { Client,Pool } = require("pg");
 const querys = require("./queries");
 
 const postgresClient = new Client({
@@ -7,12 +7,23 @@ const postgresClient = new Client({
   password: "123",
   port: 5432,
 });
+
 const matchaClient = new Client({
   host: "localhost",
   user: "mel-hamr",
   password: "123",
   database: "matcha",
   port: 5432,
+});
+
+const matchaPool = new Pool({
+  user: 'mel-hamr',
+  host: 'localhost',
+  database: 'matcha',
+  password: '123',
+  port: 5432,
+  max: 10, // maximum number of clients in the pool
+  idleTimeoutMillis: 30000, // how long a client is allowed to remain idle before being closed
 });
 
 const createDatabase = async () => {
@@ -35,8 +46,7 @@ const createDatabase = async () => {
 
 const createTables = async () => {
   try {
-    await matchaClient.connect();
-    const result = await matchaClient.query(querys.createTable);
+    await matchaPool.query(querys.createTable);
     return true;
   } catch (error){
     console.log(error)
@@ -46,6 +56,6 @@ const createTables = async () => {
 
 
 module.exports = {
-  createDatabase,createTables,matchaClient
+  createDatabase,createTables,matchaClient,matchaPool
 };
 // how to create a express get request ?

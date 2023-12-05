@@ -1,6 +1,8 @@
 const { Client } = require("pg");
 const client = require("./createDB");
 const matchaClient = client.matchaClient;
+const matchaPool = client.matchaPool;
+
 
 const createRecord = async (user, table) => {
   const data = user;
@@ -10,28 +12,38 @@ const createRecord = async (user, table) => {
 
   const query = `INSERT INTO ${table} (${columns}) VALUES (${placeholders}) RETURNING *`;
   let result;
-  if (!matchaClient._connected) matchaClient.connect().catch((e) => {});
-  result = await matchaClient.query(query, values);
+  result = await matchaPool.query(query, values);
   return result.rows[0];
 };
 
-// Read
+
 async function getAllRecords(table) {
   const query = `SELECT * FROM ${table}`;
-  return db.any(query);
+  let result;
+  result = await matchaPool.query(query);
+  return result.rows[0];
 }
+
+
 
 async function getRecordById(table, id) {
   const query = `SELECT * FROM ${table} WHERE id = $1`;
-  if (!matchaClient._connected) matchaClient.connect().catch((e) => {});
-  let result = await matchaClient.query(query, [id]);
+
+  let result = await matchaPool.query(query, [id]);
   return result.rows[0];
 }
 
 async function getRecordBy(table, columnName, columnValue) {
   const query = `SELECT * FROM ${table} WHERE ${columnName} = $1`;
-  if (!matchaClient._connected) matchaClient.connect().catch((e) => {});
-  let result = await matchaClient.query(query, [columnValue])
+
+  let result = await matchaPool.query(query, [columnValue]);
+  return result.rows[0];
+}
+
+async function getRecordBy(table, columnName, columnValue) {
+  const query = `SELECT * FROM ${table} WHERE ${columnName} = $1`;
+
+  let result = await matchaPool.query(query, [columnValue]);
   return result.rows[0];
 }
 
@@ -42,15 +54,13 @@ const updateRecord = async (table, id, updateObject) => {
   const setClause = columns.map((col, i) => `${col} = $${i + 2}`).join(", ");
 
   const query = `UPDATE ${table} SET ${setClause} WHERE id = $1 RETURNING *`;
-  if (!matchaClient._connected) matchaClient.connect();
-  let result = await matchaClient.query(query, [id, ...values])
+  let result = await matchaPool.query(query, [id, ...values]);
   return result.rows[0];
 };
 
 async function deleteRecord(table, id) {
   const query = `DELETE FROM ${table} WHERE id = $1 RETURNING *`;
-  if (!matchaClient._connected) matchaClient.connect().catch((e) => {});
-  let result = await matchaClient.query(query, [id])
+  let result = await matchaPool.query(query, [id]);
   return result.rows[0];
 }
 
