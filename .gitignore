@@ -1,6 +1,6 @@
-./dataBase/.env
-./server/.env
-./.DS_Store
+/dataBase/.env
+/server/.env
+/.DS_Store
 /server/.DS_Store
 /server/src/.DS_Store
 /server/src/data/.DS_Store
