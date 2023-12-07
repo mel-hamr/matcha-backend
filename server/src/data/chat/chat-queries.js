@@ -54,7 +54,7 @@ const getConversation = async (userID) => {
         chatQueries.getUserConversationsQuery,
         [userID]
     );
-    console.log("conversation", conversations.rows);
+    // console.log("conversation", conversations.rows);
     return conversations.rows[0];
 };
 

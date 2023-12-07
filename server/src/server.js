@@ -1,7 +1,10 @@
 const express = require("express");
 const crud = require("./data/db/crud");
 const dataBase = require("./data/db/createDB");
+const userRouter = require("./routes/user/route");
 // const userRouter =require('./src/routes/user/route')
+const userServices = require("./services/user/user-service");
+const chatService = require("./services/chat/chat.service");
 var bodyParser = require("body-parser");
 var cors = require("cors");
 
@@ -9,17 +12,22 @@ const app = express();
 const port = 3000;
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(cors());
+
+app.use(
+    cors({
+        origin: "http://localhost:4200",
+        credentials: true,
+    })
+);
 
 const httpServer = require("http").createServer(app);
 
-const chatService = require("./services/chat/chat.service");
-
 const io = require("socket.io")(httpServer, {
-    cors: { origin: "*" },
+    cors: { origin: "http://localhost:4200", credentials: true },
 });
 
 // body parser
+app.use("/user", userRouter);
 
 app.get("/", (req, res) => {
     res.send("hello world");
@@ -60,6 +68,7 @@ io.on("connection", (socket) => {
     let err;
     socket.join(socket.handshake.query.roomID.toString());
 
+    console.log(socket.handshake.headers.cookie);
     socket.on("sendFriendMessage", (message) => {
         console.log("sender", message);
         if (
@@ -69,10 +78,10 @@ io.on("connection", (socket) => {
         ) {
             // need to check if sender and receiver are friends
             chatService.sendMessage(message, err);
-            console.log(
-                message.sender_id.toString(),
-                socket.handshake.query.roomID
-            );
+            // console.log(
+            //     message.sender_id.toString(),
+            //     socket.handshake.query.roomID
+            // );
             if (
                 message.sender_id.toString() === socket.handshake.query.roomID
             ) {

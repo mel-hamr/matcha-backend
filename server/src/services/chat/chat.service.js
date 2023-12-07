@@ -17,7 +17,7 @@ const getMessages = async (cnvId) => {
     // message: string;
     // date: Date;
     // isMe: boolean;
-    console.log('cnvId',cnvId);
+    // console.log('cnvId',cnvId);
     let conversation = await chatRepository.getMessages(cnvId);
     conversation = conversation.map((message) => {
         return {
@@ -27,7 +27,7 @@ const getMessages = async (cnvId) => {
             isMe: message.sender === "1" ? true : false,
         };
     });
-    console.log(conversation);
+    // console.log(conversation);
     return conversation;
 };
 const getConversations = async (userID) => {
@@ -51,7 +51,7 @@ const calculateDate = (date) => {
     const currentDate = new Date();
     const dateDiffrentInMs = currentDate.getTime() - date.getTime();
     let ret;
-    console.log(dateDiffrentInMs);
+    // console.log(dateDiffrentInMs);
     if (dateDiffrentInMs < 60 * 60 * 1000) {
         ret = Math.trunc(dateDiffrentInMs / (60 * 1000)) + "m ago";
     } else if (dateDiffrentInMs < 24 * 60 * 60 * 1000) {
@@ -62,7 +62,7 @@ const calculateDate = (date) => {
         ret =
             Math.trunc(dateDiffrentInMs / (7 * 24 * 60 * 60 * 1000)) + "w ago";
     }
-    console.log(Math.trunc(dateDiffrentInMs / (60 * 60 * 1000)));
+    // console.log(Math.trunc(dateDiffrentInMs / (60 * 60 * 1000)));
     return ret;
 };
 
