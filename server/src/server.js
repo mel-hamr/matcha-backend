@@ -67,11 +67,30 @@ io.on("connection", (socket) => {
             message.receiver_id !== undefined &&
             message.message !== undefined
         ) {
+            // need to check if sender and receiver are friends
             chatService.sendMessage(message, err);
-            socket
-                .to(message.sender_id.toString())
-                .to(message.receiver_id.toString())
-                .emit("receiveFriendMessage", message);
+            console.log(
+                message.sender_id.toString(),
+                socket.handshake.query.roomID
+            );
+            if (
+                message.sender_id.toString() === socket.handshake.query.roomID
+            ) {
+                message.isMe = true;
+                socket
+                    .to(message.sender_id.toString())
+                    .emit("receiveFriendMessage", message);
+            } else {
+                message.isMe = false;
+                socket
+                    .to(message.sender_id.toString())
+                    .emit("receiveFriendMessage", message);
+            }
+
+            // socket
+            //     .to(message.sender_id.toString())
+            //     .to(message.receiver_id.toString())
+            //     .emit("receiveFriendMessage", message);
         }
     });
 

@@ -4,7 +4,7 @@ INSERT INTO public.message (
     DEFAULT,
     1, -- Conversation ID for Spiderman and Iron Man
     1, -- User ID for Spiderman
-    'Hey, Iron Man! Just saved the day again. How\'s it going?',
+    'Hey, Iron Man! Just saved the day again. How s it going?',
     '2023-11-14 12:15:00'
 );
 
@@ -67,7 +67,7 @@ INSERT INTO public.message (
     DEFAULT,
     4, -- Conversation ID for Iron Man and Captain America
     4, -- User ID for Iron Man
-    'Cap, need backup. There\'s a new villain in town.',
+    'Cap, need backup. There s a new villain in town.',
     '2023-11-14 13:15:00'
 );
 
