@@ -17,6 +17,7 @@ const createTable = `
     "latitude" VARCHAR(255),
     "longitude" VARCHAR(255),
     "verified" BOOLEAN,
+    "profile_completion_status" BOOLEAN,
     is_online BOOLEAN,
     PRIMARY KEY ("id")
   );
