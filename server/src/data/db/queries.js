@@ -17,6 +17,7 @@ const createTable = `
     "latitude" VARCHAR(255),
     "longitude" VARCHAR(255),
     "verified" BOOLEAN,
+    "profile_completion_status" BOOLEAN,
     is_online BOOLEAN,
     PRIMARY KEY ("id")
   );
@@ -50,13 +51,16 @@ const createTable = `
   CREATE TABLE IF NOT EXISTS message (
     id SERIAL PRIMARY KEY,
     conversation_id INT REFERENCES conversation(id),
-    sender_id INT REFERENCES users(id),
+    sender varchar(255),
     text varchar(255),
     date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   );
 `;
 
 module.exports = {
+    checkDbExist,
+    createDb,
+    createTable,
     checkDbExist,
     createDb,
     createTable,
