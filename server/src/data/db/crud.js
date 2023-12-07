@@ -71,4 +71,10 @@ module.exports = {
     deleteRecord,
     getRecordById,
     getRecordBy,
+    createRecord,
+    getAllRecords,
+    updateRecord,
+    deleteRecord,
+    getRecordById,
+    getRecordBy,
 };

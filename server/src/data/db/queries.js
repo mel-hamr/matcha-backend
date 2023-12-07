@@ -61,4 +61,7 @@ module.exports = {
     checkDbExist,
     createDb,
     createTable,
+    checkDbExist,
+    createDb,
+    createTable,
 };

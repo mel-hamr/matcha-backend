@@ -1,14 +1,10 @@
 const chatRepository = require("../../data/chat/chat-queries");
 
 const sendMessage = async (data, err) => {
-    try {
-        data.date = new Date();
-        const conversation = await chatRepository.saveConvertaion(data);
-        data.cnvId = conversation.id;
-        await chatRepository.saveMessage(data);
-    } catch (e) {
-        console.log(e);
-    }
+    data.date = new Date();
+    const conversation = await chatRepository.saveConvertaion(data);
+    data.cnvId = conversation.id;
+    await chatRepository.saveMessage(data);
 };
 
 const getConversation = async (userID) => {
@@ -16,6 +12,24 @@ const getConversation = async (userID) => {
     return conversations;
 };
 
+const getMessages = async (cnvId) => {
+    // id: number;
+    // message: string;
+    // date: Date;
+    // isMe: boolean;
+    console.log('cnvId',cnvId);
+    let conversation = await chatRepository.getMessages(cnvId);
+    conversation = conversation.map((message) => {
+        return {
+            id: message.id,
+            message: message.text,
+            date: message.date,
+            isMe: message.sender === "1" ? true : false,
+        };
+    });
+    console.log(conversation);
+    return conversation;
+};
 const getConversations = async (userID) => {
     const conversations = await chatRepository.getConversations(userID);
 
@@ -23,12 +37,13 @@ const getConversations = async (userID) => {
         id: conversation.id,
         name: conversation.username,
         avatar: conversation.avatar,
+        user_id: conversation.user_id,
         lastMessage: conversation.last_message,
         date: calculateDate(conversation.date),
         isRead: conversation.is_read,
     }));
 
-    console.log(updatedConversations);
+    // console.log(updatedConversations);
     return updatedConversations;
 };
 
@@ -54,4 +69,5 @@ const calculateDate = (date) => {
 module.exports = {
     sendMessage,
     getConversations,
+    getMessages,
 };
