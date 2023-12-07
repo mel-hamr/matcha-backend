@@ -28,6 +28,7 @@ const userSignIn = async (userWo, res) => {
     userWo.latitude = data.lat;
     userWo.longitude = data.lon;
   }
+  userWo.password = await bcrypt.hash(userWo.password, 10);
   newUser = await generalCrude.createRecord(userWo, "users");
   if (newUser) {
     console.log("====================================");
@@ -115,4 +116,56 @@ const verifyUserEmail = async (userId, uniqueString, res) => {
   }
 };
 
-module.exports = { userSignIn, verifyUserEmail };
+
+const userLogin =  async (username, password, res) => {
+  userRepo
+    .getUserByUsernameOrEmail(username, username)
+    .then(  (user) => {
+      if (user) {
+        if(user.verified){
+        bcrypt.compare(password, user.password).then(async (result) => {
+          if (result) {
+            let accessToken = auth.signJWT(
+              {
+                username: user.username,
+                email_address: user.email_address,
+                user_id: user.id,
+              },
+              "5m"
+            );
+            let session = await generalCrude.createRecord(
+              { user_id: user.id, username: user.username,valid: true },
+              "sessions",
+              res
+            );
+            console.log(session);
+            let refreshToken = auth.signJWT({ session_id: session.id }, "1d");
+
+            // set access token in cookie
+            res.cookie("accessToken", accessToken, {
+              maxAge: 300000, // 5 minutes
+              httpOnly: true,
+            });
+            // set refresh token in cookie
+            res.cookie("refreshToken", refreshToken, {
+              maxAge: 60 * 60 * 24 * 1000, // 1 year
+              httpOnly: true,
+            });
+            res.status(200).send({ session : session,message: "user logged in successfully" });
+          } else {
+            console.log("invalid password")
+            res.status(400).send("invalid username or password");
+          }
+        });
+        }
+        else{
+          console.log("user not verified")
+          res.status(400).send("user not verified, please check your email");
+        }
+      } else {
+        console.log("invalid username ")
+        res.status(400).send("invalid username or password");
+      }
+    })
+}
+module.exports = { userSignIn, verifyUserEmail,userLogin };

@@ -36,6 +36,7 @@ app.post("/", (req, res) => {
 });
 app.post("/add", crud.createRecord);
 app.post("/update", crud.updateRecord);
+
 app.get("/start/intiate", async (req, res) => {
   await dataBase.createDatabase();
   await dataBase.createTables();
