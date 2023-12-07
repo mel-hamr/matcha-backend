@@ -1,4 +1,5 @@
 const express = require("express");
+
 const crud = require("./src/data/db/crud");
 const dataBase = require("./src/data/db/createDB");
 const userRouter = require("./src/routes/user/route");
@@ -6,6 +7,7 @@ var bodyParser = require("body-parser");
 const cors = require("cors");
 var cookieParser = require("cookie-parser");
 const authservice = require("./src/services/auth/jwt.utils");
+
 
 const app = express();
 const port = 3000;
@@ -38,10 +40,12 @@ app.post("/add", crud.createRecord);
 app.post("/update", crud.updateRecord);
 
 app.get("/start/intiate", async (req, res) => {
+
   await dataBase.createDatabase();
   await dataBase.createTables();
   res.status(200).send("data base created succsesfully");
 });
+
 
 app.use((err, req, res, next) => {
   console.log("=============> error handler <=============");
