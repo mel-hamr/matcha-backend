@@ -19,6 +19,14 @@ app.use(
         credentials: true,
     })
 );
+app.use((req, res, next) => {
+    res.header("Access-Control-Allow-Origin", "http://localhost:4200");
+    res.header(
+        "Access-Control-Allow-Headers",
+        "Origin, X-Requested-With, Content-Type, Accept"
+    );
+    next();
+});
 
 const httpServer = require("http").createServer(app);
 
@@ -66,9 +74,9 @@ app.get("/conversations", async (req, res) => {
 
 io.on("connection", (socket) => {
     let err;
+
     socket.join(socket.handshake.query.roomID.toString());
 
-    console.log(socket.handshake.headers.cookie);
     socket.on("sendFriendMessage", (message) => {
         console.log("sender", message);
         if (
@@ -82,6 +90,11 @@ io.on("connection", (socket) => {
             //     message.sender_id.toString(),
             //     socket.handshake.query.roomID
             // );
+            console.log(
+                "object",
+                message.sender_id.toString(),
+                socket.handshake.query.roomID
+            );
             if (
                 message.sender_id.toString() === socket.handshake.query.roomID
             ) {
@@ -89,13 +102,11 @@ io.on("connection", (socket) => {
                 socket
                     .to(message.sender_id.toString())
                     .emit("receiveFriendMessage", message);
-            } else {
                 message.isMe = false;
                 socket
-                    .to(message.sender_id.toString())
+                    .to(message.receiver_id.toString())
                     .emit("receiveFriendMessage", message);
             }
-
             // socket
             //     .to(message.sender_id.toString())
             //     .to(message.receiver_id.toString())
