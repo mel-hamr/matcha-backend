@@ -1,6 +1,6 @@
 const client = require("../db/createDB");
-const matchaPool = client.matchaPool;
 const userQueries = require("./user-queries");
+const matchaPool = client.matchaPool;
 
 const getUserByUsernameOrEmail = async (username,email_address) => {
   

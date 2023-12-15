@@ -1,11 +1,4 @@
-const {
-    createRecord,
-    getAllRecords,
-    updateRecord,
-    deleteRecord,
-    getRecordById,
-    getRecordBy,
-} = require("../db/crud");
+const { createRecord, updateRecord } = require("../db/crud");
 const chatQueries = require("../chat/queries");
 const client = require("../db/createDB");
 const matchaClient = client.matchaClient;
@@ -18,20 +11,25 @@ const saveConvertaion = async (message) => {
         chatQueries.getConversationQuery,
         [message.sender_id, message.receiver_id]
     );
-
-    if (!conversationExist.rows.length) {
+    console.log("cnv exist", conversationExist.rows);
+    if (!conversationExist.rows) {
         let conversation = {
             Participant_a: message.sender_id,
             Participant_b: message.receiver_id,
             last_message: message.message,
             is_read: false,
+            unread_messages: 0,
         };
         conversation = await createRecord(conversation, "conversation");
     } else {
         conversation = await updateRecord(
             "conversation",
             conversationExist.rows[0].id,
-            { last_message: message.message, is_read: false }
+            {
+                last_message: message.message,
+                is_read: false,
+                unread_messages: conversationExist.rows[0].unread_messages + 1,
+            }
         );
     }
     return conversation;
@@ -44,6 +42,8 @@ const saveMessage = async (message) => {
         text: message.message,
         date: message.date,
     };
+    console.log("save message", message);
+
     return await createRecord(msg, "message");
 };
 

@@ -12,7 +12,7 @@ const getConversation = async (userID) => {
     return conversations;
 };
 
-const getMessages = async (cnvId) => {
+const getMessages = async (cnvId, userID) => {
     // id: number;
     // message: string;
     // date: Date;
@@ -20,11 +20,13 @@ const getMessages = async (cnvId) => {
     // console.log('cnvId',cnvId);
     let conversation = await chatRepository.getMessages(cnvId);
     conversation = conversation.map((message) => {
+        // if(message.sender === userID)
+        console.log("sender", userID);
         return {
             id: message.id,
             message: message.text,
             date: message.date,
-            isMe: message.sender === "1" ? true : false,
+            isMe: message.sender === userID ? true : false,
         };
     });
     // console.log(conversation);
@@ -32,7 +34,7 @@ const getMessages = async (cnvId) => {
 };
 const getConversations = async (userID) => {
     const conversations = await chatRepository.getConversations(userID);
-
+    // console.log(conversations);
     const updatedConversations = conversations.map((conversation) => ({
         id: conversation.id,
         name: conversation.username,

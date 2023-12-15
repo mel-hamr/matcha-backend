@@ -2,9 +2,11 @@ const express = require("express");
 const crud = require("./data/db/crud");
 const dataBase = require("./data/db/createDB");
 const userRouter = require("./routes/user/route");
+const chatRouter = require("./routes/chat/chat");
+const chatService = require("./services/chat/chat.service");
+const notificationRouter = require("./routes/notification/notification.router");
 // const userRouter =require('./src/routes/user/route')
 const userServices = require("./services/user/user-service");
-const chatService = require("./services/chat/chat.service");
 var bodyParser = require("body-parser");
 var cors = require("cors");
 
@@ -41,6 +43,8 @@ app.get("/", (req, res) => {
     res.send("hello world");
 });
 
+app.use("/chat", chatRouter);
+app.use("/notification", notificationRouter);
 app.post("/add", (req, res, data) => {
     // console.log(req.body);
     return crud.createRecord(req.body, "users", res);
@@ -53,32 +57,12 @@ app.get("/start/intiate", async (req, res) => {
     res.status(200).send("data base created succsesfully");
 });
 
-app.get("/messages", async (req, res) => {
-    const cnvId = req.query.cnvId;
-    const messages = await chatService.getMessages(cnvId);
-    res.status(200).send(messages);
-});
-
-// app.get("/sendMessage", async (req, res) => {
-//     console.log(req.body);
-//     // chatService.sendMessage()
-//     res.send(200).send('sent')
-// })
-
-app.get("/conversations", async (req, res) => {
-    const userID = req.query.userID;
-    // console.log("room", userID);
-    const conversations = await chatService.getConversations(userID);
-    res.status(200).send(conversations);
-});
-
 io.on("connection", (socket) => {
     let err;
 
     socket.join(socket.handshake.query.roomID.toString());
 
     socket.on("sendFriendMessage", (message) => {
-        console.log("sender", message);
         if (
             message.sender_id !== undefined &&
             message.receiver_id !== undefined &&
@@ -90,11 +74,7 @@ io.on("connection", (socket) => {
             //     message.sender_id.toString(),
             //     socket.handshake.query.roomID
             // );
-            console.log(
-                "object",
-                message.sender_id.toString(),
-                socket.handshake.query.roomID
-            );
+
             if (
                 message.sender_id.toString() === socket.handshake.query.roomID
             ) {
@@ -103,6 +83,9 @@ io.on("connection", (socket) => {
                     .to(message.sender_id.toString())
                     .emit("receiveFriendMessage", message);
                 message.isMe = false;
+                socket
+                    .to(message.receiver_id.toString())
+                    .emit("newNotification", message);
                 socket
                     .to(message.receiver_id.toString())
                     .emit("receiveFriendMessage", message);
