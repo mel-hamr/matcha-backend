@@ -26,4 +26,9 @@ const updateNotification = async (userId, notificationId) => {
     return result;
 };
 
-module.exports = { addNotification, getNotificationCount, getNotifications, updateNotification };
+module.exports = {
+    addNotification,
+    getNotificationCount,
+    getNotifications,
+    updateNotification,
+};
