@@ -1,12 +1,11 @@
 const express = require("express");
-
-const crud = require("./src/data/db/crud");
-const dataBase = require("./src/data/db/createDB");
-const userRouter = require("./src/routes/user/route");
+const crud = require("./data/db/crud");
+const dataBase = require("./data/db/createDB");
+const userRouter = require("./routes/user/route");
 var bodyParser = require("body-parser");
 const cors = require("cors");
 var cookieParser = require("cookie-parser");
-const authservice = require("./src/services/auth/jwt.utils");
+const authservice = require("./services/auth/jwt.utils");
 
 
 const app = express();
