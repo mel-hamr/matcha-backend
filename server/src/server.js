@@ -7,6 +7,7 @@ const cors = require("cors");
 var cookieParser = require("cookie-parser");
 const authservice = require("./services/auth/jwt.utils");
 
+
 const app = express();
 const port = 3000;
 // cookie parser
@@ -38,10 +39,12 @@ app.post("/add", crud.createRecord);
 app.post("/update", crud.updateRecord);
 
 app.get("/start/intiate", async (req, res) => {
+
   await dataBase.createDatabase();
   await dataBase.createTables();
   res.status(200).send("data base created succsesfully");
 });
+
 
 app.use((err, req, res, next) => {
   console.log("=============> error handler <=============");
