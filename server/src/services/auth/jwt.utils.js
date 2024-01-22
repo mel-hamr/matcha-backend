@@ -30,5 +30,6 @@ const decodeJWT = (token) => {
 }
 module.exports = {
   signJWT,
+  verifyJWT,
   decodeJWT,
 };

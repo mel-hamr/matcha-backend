@@ -14,6 +14,10 @@ const port = 3000;
 app.use(cookieParser());
 // body parser
 app.use(bodyParser.json());
+app.use(express.json())
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static("public"));
+
 // cors
 app.use(
   cors({
@@ -23,7 +27,6 @@ app.use(
 );
 // routes
 app.use("/user", userRouter);
-
 app.get("/", (req, res) => {
   console.log("-----------------------");
   console.log(req.cookies);

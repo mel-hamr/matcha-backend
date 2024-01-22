@@ -151,7 +151,7 @@ const userLogin =  async (username, password, res) => {
               maxAge: 60 * 60 * 24 * 1000, // 1 year
               httpOnly: true,
             });
-            res.status(200).send({ session : session,message: "user logged in successfully" });
+            res.status(200).send({ session : session,message: "user logged in successfully" , signCompleteStatus : user.profile_completion_status});
           } else {
             console.log("invalid password")
             res.status(400).send("invalid username or password");
@@ -168,4 +168,10 @@ const userLogin =  async (username, password, res) => {
       }
     })
 }
+
+const completeSignup = async (completeSignupDTO , res) => {
+  
+}
+
+
 module.exports = { userSignIn, verifyUserEmail,userLogin };
