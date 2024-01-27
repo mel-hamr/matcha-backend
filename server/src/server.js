@@ -6,7 +6,7 @@ var bodyParser = require("body-parser");
 const cors = require("cors");
 var cookieParser = require("cookie-parser");
 const authservice = require("./services/auth/jwt.utils");
-
+const deserializeUser = require("./middlewares/auth/deserializeUser")
 
 const app = express();
 const port = 3000;
@@ -25,6 +25,7 @@ app.use(
     credentials: true,
   })
 );
+app.use(deserializeUser)
 // routes
 app.use("/user", userRouter);
 app.get("/", (req, res) => {

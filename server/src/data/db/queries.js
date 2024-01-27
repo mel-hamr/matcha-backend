@@ -19,7 +19,7 @@ const createTable = `
     "verified" BOOLEAN,
     "profile_completion_status" BOOLEAN,
     "is_online" BOOLEAN,
-    "birthdate" DATE DEFAULT "1990-01-01",
+    "birthdate" DATE ,
     PRIMARY KEY ("id")
   );
   CREATE TABLE IF NOT EXISTS "views" (

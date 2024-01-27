@@ -9,7 +9,7 @@
       body {
         margin: 0;
         padding: 0;
-        color: #fff;
+        color: #7d6c62;
         font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS",
           sans-serif;
         height: 100vh;
@@ -19,7 +19,7 @@
         display: flex;
         flex-direction: column;
         margin: 0 auto;
-        width: 50%;
+        width: 40%;
         align-items: center;
         padding-bottom: 25px;
         padding-top: 10px;
@@ -63,6 +63,9 @@
         -webkit-animation-name: swing;
         animation-name: swing;
       }
+      .error h2 , .error h3 , .error p {
+        color : #FFFFFF;
+      }
     </style>
   </head>
 
@@ -74,13 +77,13 @@
     const message = urlParams.get("message");
 
     const bodyContent = !error
-      ? `<div style="background-color: #065f46">
+      ? `<div style="background-color: #F9FAFF">
       <h2>Email has been verified</h2>
       <svg
         xmlns="http://www.w3.org/2000/svg"
         width="85"
         height="85"
-        fill="currentColor"
+        fill="#FF676E"
         class="bi bi-check-circle-fill animated swing"
         viewBox="0 0 16 16"
       >
@@ -90,14 +93,14 @@
       </svg>
       <h3>You can now log in</h3>
 
-      <p>@ToThePointCode</p>
+      <p>@MATCHA</p>
     </div>`
-      : `<div style="background-color: #991B1B">
+      : `<div class="error" style="background-color: #FF676E">
       <h2>${message}</h2>
       <svg 
         xmlns="http://www.w3.org/2000/svg" 
         width="85" height="85" 
-        fill="currentColor" 
+        fill="#FFFFFF" 
         class="bi bi-x-circle-fill animated swing" 
         viewBox="0 0 16 16"
       >
@@ -105,10 +108,10 @@
       </svg>
       <h3>Please try again!</h3>
 
-      <p>MATCHA</p>
+      <p>@MATCHA</p>
     </div>`;
 
-    document.body.style.backgroundColor = error ? "#7F1D1D" : "#064e3b";
+    document.body.style.backgroundColor = error ? "#FFFFFF" : "#FFFFFF";
     document.body.innerHTML = bodyContent;
   </script>
 </html>

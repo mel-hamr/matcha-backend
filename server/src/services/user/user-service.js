@@ -4,6 +4,7 @@ const userRepo = require("../../data/user/user-repository");
 const verifocationEmailHelper = require("./helper/verification-email-helper");
 const bcrypt = require("bcrypt");
 const axios = require("axios");
+const userMapper = require("./helper/user-mapper")
 
 const userSignIn = async (userWo, res) => {
   let newUser;
@@ -169,9 +170,16 @@ const userLogin =  async (username, password, res) => {
     })
 }
 
-const completeSignup = async (completeSignupDTO , res) => {
-  
+const completeSignup = async (req, res ,completeSignupDTO ) => {
+  let user = await generalCrude.getRecordBy("users","username" ,req.user.username);
+  if(!user){
+    res.status(400).send("user not found");
+    return;
+  }
+  let updateUserDTO = userMapper.mapCompleteSingupDTOToUpdateUserDTO(completeSignupDTO);
+  generalCrude.updateRecord("users",user.id,updateUserDTO);
+  res.status(200).send({ message :"user updated successfully"});
 }
 
 
-module.exports = { userSignIn, verifyUserEmail,userLogin };
+module.exports = { userSignIn, verifyUserEmail,userLogin ,completeSignup};

@@ -23,15 +23,15 @@ let tags = [
 
 class CompleteSignupDTO {
   gender;
-  sexualPreference;
+  sexual_preference;
   biography;
   photos;
   tags;
   birthdate;
-
+  images = [];
   constructor(data, photos) {
     this.gender = data.gender;
-    this.sexualPreference = data.sexualPreference;
+    this.sexual_preference = data.sexualPreference;
     this.biography = data.biography;
     this.birthdate = data.birthdate;
     this.photos = photos;
@@ -45,7 +45,7 @@ class CompleteSignupDTO {
     ///// check if all fields are present
     if (
       this.gender == undefined ||
-      this.sexualPreference == undefined ||
+      this.sexual_preference == undefined ||
       this.biography == undefined ||
       this.birthdate == undefined ||
       this.photos == undefined
@@ -55,7 +55,7 @@ class CompleteSignupDTO {
     ///// check if gender and sexualPreference are valid
     if (
       (this.gender != "male" && this.gender != "female") ||
-      (this.sexualPreference != "male" && this.sexualPreference != "female")
+      (this.sexual_preference != "male" && this.sexual_preference != "female")
     ) {
       console.log("gender or sexualPreference invalid");
       this.errorMessages = "gender or sexualPreference invalid";

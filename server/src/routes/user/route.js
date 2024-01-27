@@ -5,6 +5,8 @@ const userSerivce = require("../../services/user/user-service");
 const path = require("path");
 const userSignInDTO = require("../DTO/user/userSignInDTO");
 const CompleteSignupDTO = require("../DTO/user/completeSignupDTO");
+const requireUser = require("../../middlewares/auth/requireUser");
+
 ///// multer
 const multer = require("multer");
 const storage = multer.memoryStorage();
@@ -64,31 +66,55 @@ router.post("/getVerification", async (req, res) => {
   });
 });
 
-router.post("/test", upload.array("photos", 5), async (req, res) => {
-  console.log("upload photos start");
-  try {
-    req.body.tags = JSON.parse(req.body.tags);
-  } catch (err) {
-    res.status(400).send("invalid tags format");
-    return;
+router.post(
+  "/test",
+  requireUser,
+  upload.array("photos", 5),
+  async (req, res) => {
+    try {
+      req.body.tags = JSON.parse(req.body.tags);
+    } catch (err) {
+      res.status(400).send("invalid tags format");
+      return;
+    }
+    let completeSingupDTO = new CompleteSignupDTO(req.body, req.files);
+    // console.log(completeSingupDTO);
+    let { status, message } = completeSingupDTO.checkAllFields();
+    if (status == false) {
+      res.status(400).send(message);
+      return;
+    }
+    for (let photo of completeSingupDTO.photos) {
+      var uploadResponse = await imagekit
+        .upload({
+          file: photo.buffer, // It accepts remote URL, base_64 string or file buffer
+          fileName: Date.now() + photo.originalname, // required
+          isPrivateFile: false,
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+      completeSingupDTO.images.push(uploadResponse.url);
+    }
+    userSerivce.completeSignup(req, res, completeSingupDTO);
+    // var uploadResponse = await imagekit.upload({
+    //   file: req.files[0].buffer, // It accepts remote URL, base_64 string or file buffer
+    //   fileName: Date.now()+ req.files[0].originalname, // required
+    //   tags: ["tag1", "tag2"], // optional
+    //   isPrivateFile: false,
+    // }).catch((err) => {
+    //   console.log(err);
+    // });
+    // console.log(uploadResponse);
   }
-  let completeSingupDTO = new CompleteSignupDTO(req.body, req.files);
-  console.log(completeSingupDTO);
-  let { status, message } = completeSingupDTO.checkAllFields();
-  if(status == false){
-    res.status(400).send(message);
-    return;
-  }
-  
-  // var uploadResponse = await imagekit.upload({
-  //   file: req.files[0].buffer, // It accepts remote URL, base_64 string or file buffer
-  //   fileName: Date.now()+ req.files[0].originalname, // required
-  //   tags: ["tag1", "tag2"], // optional
-  //   isPrivateFile: false,
-  // }).catch((err) => {
-  //   console.log(err);
-  // });
-  // console.log(uploadResponse);
-});
+);
 
+router.post('/completeSignupStatus',requireUser,async (req,res)=>{
+  let user = await generalCrude.getRecordBy("users","username" ,req.user.username);
+  if(!user){
+    res.status(400).send("user not found");
+    return;
+  }
+  res.status(200).send({signCompleteStatus : user.profile_completion_status});
+})
 module.exports = router;
