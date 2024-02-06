@@ -1,6 +1,4 @@
-const { Client } = require("pg");
 const client = require("./createDB");
-const matchaClient = client.matchaClient;
 const matchaPool = client.matchaPool;
 
 

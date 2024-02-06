@@ -29,7 +29,7 @@ router.get("/verify-email/:id/:uniqueString", async (req, res) => {
   const uniqueString = req.params.uniqueString;
   await userSerivce.verifyUserEmail(id, uniqueString, res);
 });
-0;
+
 router.get("/verified", (req, res) => {
   res.sendFile(path.join(__dirname + "../../../common/views/verified.html"));
 });

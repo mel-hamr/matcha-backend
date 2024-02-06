@@ -46,7 +46,7 @@ const createTable = `
     participant_b INT REFERENCES users(id),
     last_message VARCHAR(255),
     date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    is_read BOOLEAN
+    unread_messages INT
   );
   CREATE TABLE IF NOT EXISTS message (
     id SERIAL PRIMARY KEY,
@@ -55,6 +55,15 @@ const createTable = `
     text varchar(255),
     date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
   );
+  CREATE TABLE IF NOT EXISTS "notifacation" (
+    id SERIAL PRIMARY KEY,
+    user_id INT REFERENCES users(id),
+    type VARCHAR(255),
+    text VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    is_read BOOLEAN
+  );
+  )
 `;
 
 module.exports = {

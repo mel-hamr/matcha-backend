@@ -143,7 +143,7 @@ const userLogin =  async (username, password, res) => {
 
             // set access token in cookie
             res.cookie("accessToken", accessToken, {
-              maxAge: 300000, // 5 minutes
+              maxAge: 300000 * 12 * 8, // 5 minutes
               httpOnly: true,
             });
             // set refresh token in cookie

@@ -5,7 +5,7 @@ INSERT INTO public.conversation (
     1, -- User ID for Spiderman
     4, -- User ID for Iron Man
     'Hey, crime doesn t take a break, and neither do I!',
-    false
+    0
 );
 
 -- Conversation for Batman and Wonder Woman
@@ -16,7 +16,7 @@ INSERT INTO public.conversation (
     2, -- User ID for Batman
     5, -- User ID for Wonder Woman
     'I am the night. Gotham City is secure.',
-    false
+    0
 );
 
 -- Conversation for Wonder Woman and Superman
@@ -27,7 +27,7 @@ INSERT INTO public.conversation (
     3, -- User ID for Wonder Woman
     6, -- User ID for Superman
     'In the name of truth and justice!',
-    false
+    0
 );
 
 -- Conversation for Iron Man and Captain America
@@ -38,7 +38,7 @@ INSERT INTO public.conversation (
     4, -- User ID for Iron Man
     7, -- User ID for Captain America
     'Genius, billionaire, playboy, philanthropist reporting in!',
-    false
+    0
 );
 
 -- Conversation for Superman and Black Widow
@@ -49,7 +49,7 @@ INSERT INTO public.conversation (
     6, -- User ID for Superman
     8, -- User ID for Black Widow
     'Up, up, and away! Metropolis is safe.',
-    false
+    0
 );
 
 -- Conversation for Captain America and Thor
@@ -60,7 +60,7 @@ INSERT INTO public.conversation (
     7, -- User ID for Captain America
     9, -- User ID for Thor
     'Avengers, assemble! We have a mission.',
-    false
+    0
 );
 
 -- Conversation for Black Widow and Spiderman
@@ -71,7 +71,7 @@ INSERT INTO public.conversation (
     8, -- User ID for Black Widow
     1, -- User ID for Spiderman
     'Espionage mode activated. Keeping an eye on the shadows.',
-    false
+    0
 );
 
 -- Conversation for Thor and Batman
@@ -82,5 +82,5 @@ INSERT INTO public.conversation (
     9, -- User ID for Thor
     2, -- User ID for Batman
     'By Odin’s beard! Lightning and thunder on the horizon.',
-    false
+    0
 );
