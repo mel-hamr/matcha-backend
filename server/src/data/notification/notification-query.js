@@ -13,9 +13,15 @@ SELECT COUNT(*)
 const notificationReadQuery = `
 UPDATE public.notifacation SET is_read = true WHERE user_id = $1 AND public.notifacation.id = $2
 `;
+
+const notifiationAllReadedQuery = `
+UPDATE public.notifacation SET is_read = true WHERE user_id = $1
+`;
+
 module.exports = {
     addNotificationQuery,
     notificationCountQuery,
     getNotificationQuery,
     notificationReadQuery,
+    notifiationAllReadedQuery
 };

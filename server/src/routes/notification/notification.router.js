@@ -12,6 +12,15 @@ notificationRouter.post("/add", async (req, res) => {
     res.status(200).send(notification);
 });
 
+notificationRouter.put("/resetAllRead", async (req, res) => {
+    const userId = 1;
+    console.log('resetAllRead', userId);
+    const notification = await notificationService.resetNotificationRead(
+        userId
+    );
+    res.status(200).send(notification);
+});
+
 const calculateDate = (date) => {
     // NOTE this function is duplicated in chat.service.js
     const currentDate = new Date();

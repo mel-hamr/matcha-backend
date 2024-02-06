@@ -13,6 +13,11 @@ const getNotifications = async (userId) => {
     return result;
 };
 
+const resetNotificationRead = async (userId) => {
+    let result = await notificationRepository.resetNotificationRead(userId);
+    return result;
+};
+
 const getNotificationCount = async (userId) => {
     let result = await notificationRepository.getNotificationCount(userId);
     return result;
@@ -31,4 +36,5 @@ module.exports = {
     getNotificationCount,
     getNotifications,
     updateNotification,
+    resetNotificationRead
 };

@@ -8,7 +8,7 @@ const addNotification = async (userId, notificationId) => {
         [userId]
     );
     return result.rows[0];
-}
+};
 const getNotifications = async (userId) => {
     let result = await matchaPool.query(
         notificationQuery.getNotificationQuery,
@@ -31,6 +31,20 @@ const updateNotification = async (userId, notificationId) => {
         [userId, notificationId]
     );
     return result.rows[0];
-}
+};
 
-module.exports = { addNotification, getNotificationCount, getNotifications, updateNotification };
+const resetNotificationRead = async (userId) => {
+    let result = await matchaPool.query(
+        notificationQuery.notifiationAllReadedQuery,
+        [userId]
+    );
+    return result.rows[0];
+};
+
+module.exports = {
+    addNotification,
+    getNotificationCount,
+    getNotifications,
+    updateNotification,
+    resetNotificationRead
+};
