@@ -1,6 +1,4 @@
-const { Client } = require("pg");
 const client = require("./createDB");
-const matchaClient = client.matchaClient;
 const matchaPool = client.matchaPool;
 
 
@@ -65,10 +63,16 @@ async function deleteRecord(table, id) {
 }
 
 module.exports = {
-  createRecord,
-  getAllRecords,
-  updateRecord,
-  deleteRecord,
-  getRecordById,
-  getRecordBy,
+    createRecord,
+    getAllRecords,
+    updateRecord,
+    deleteRecord,
+    getRecordById,
+    getRecordBy,
+    createRecord,
+    getAllRecords,
+    updateRecord,
+    deleteRecord,
+    getRecordById,
+    getRecordBy,
 };

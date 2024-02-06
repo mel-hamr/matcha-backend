@@ -54,7 +54,6 @@ const createTables = async () => {
   }
 };
 
-
 module.exports = {
   createDatabase,createTables,matchaClient,matchaPool
 };
