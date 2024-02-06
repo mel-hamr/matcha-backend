@@ -5,7 +5,6 @@ const userRouter = require("./routes/user/route");
 const chatRouter = require("./routes/chat/chat");
 const chatService = require("./services/chat/chat.service");
 const notificationRouter = require("./routes/notification/notification.router");
-// const userRouter =require('./src/routes/user/route')
 const userServices = require("./services/user/user-service");
 var bodyParser = require("body-parser");
 var cors = require("cors");
@@ -21,6 +20,7 @@ app.use(
         credentials: true,
     })
 );
+
 app.use((req, res, next) => {
     res.header("Access-Control-Allow-Origin", "http://localhost:4200");
     res.header(
@@ -74,7 +74,6 @@ io.on("connection", (socket) => {
             //     message.sender_id.toString(),
             //     socket.handshake.query.roomID
             // );
-
             if (
                 message.sender_id.toString() === socket.handshake.query.roomID
             ) {
@@ -96,7 +95,6 @@ io.on("connection", (socket) => {
             //     .emit("receiveFriendMessage", message);
         }
     });
-
     socket.on("disconnect", () => {
         console.log("a user disconnected!");
     });

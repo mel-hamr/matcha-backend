@@ -66,6 +66,8 @@ const createTable = `
   )
 `;
 
+
+
 module.exports = {
     checkDbExist,
     createDb,
