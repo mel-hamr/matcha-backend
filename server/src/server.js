@@ -5,15 +5,22 @@ const userRouter = require("./routes/user/route");
 const chatRouter = require("./routes/chat/chat");
 const chatService = require("./services/chat/chat.service");
 const notificationRouter = require("./routes/notification/notification.router");
-const userServices = require("./services/user/user-service");
+const authservice = require("./services/auth/jwt.utils");
+const deserializeUser = require("./middlewares/auth/deserializeUser")
+var cookieParser = require("cookie-parser");
 var bodyParser = require("body-parser");
 var cors = require("cors");
 
 const app = express();
 const port = 3000;
+// cookie parser
+app.use(cookieParser());
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-
+app.use(express.json())
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static("public"));
 app.use(
     cors({
         origin: "http://localhost:4200",
@@ -29,6 +36,7 @@ app.use((req, res, next) => {
     );
     next();
 });
+app.use(deserializeUser);
 
 const httpServer = require("http").createServer(app);
 
@@ -38,19 +46,17 @@ const io = require("socket.io")(httpServer, {
 
 // body parser
 app.use("/user", userRouter);
-
 app.get("/", (req, res) => {
-    res.send("hello world");
-});
+    console.log("-----------------------");
+    console.log(req.cookies);
+    res.status(200).send({ name: "hello world" });
+  });
+  
 
 app.use("/chat", chatRouter);
 app.use("/notification", notificationRouter);
-app.post("/add", (req, res, data) => {
-    // console.log(req.body);
-    return crud.createRecord(req.body, "users", res);
-});
+app.post("/add", crud.createRecord);
 app.post("/update", crud.updateRecord);
-
 app.get("/start/intiate", async (req, res) => {
     await dataBase.createDatabase();
     await dataBase.createTables();
@@ -100,4 +106,9 @@ io.on("connection", (socket) => {
     });
 });
 
+app.use((err, req, res, next) => {
+    console.log("=============> error handler <=============");
+    res.status(500).send(err.message);
+  });
+  
 httpServer.listen(port, () => console.log("hello from server port 3000"));

@@ -18,7 +18,8 @@ const createTable = `
     "longitude" VARCHAR(255),
     "verified" BOOLEAN,
     "profile_completion_status" BOOLEAN,
-    is_online BOOLEAN,
+    "is_online" BOOLEAN,
+    "birthdate" DATE ,
     PRIMARY KEY ("id")
   );
   CREATE TABLE IF NOT EXISTS "views" (

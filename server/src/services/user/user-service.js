@@ -4,6 +4,7 @@ const userRepo = require("../../data/user/user-repository");
 const verifocationEmailHelper = require("./helper/verification-email-helper");
 const bcrypt = require("bcrypt");
 const axios = require("axios");
+const userMapper = require("./helper/user-mapper")
 
 const userSignIn = async (userWo, res) => {
     let newUser;
@@ -35,33 +36,6 @@ const userSignIn = async (userWo, res) => {
     if (newUser) {
         console.log("====================================");
         console.log(newUser);
-
-        // let accessToken = auth.signJWT(
-        //   {
-        //     username: userWo.username,
-        //     email_address: userWo.email_address,
-        //     user_id: newUser.id,
-        //   },
-        //   "5m"
-        // );
-        // let session = await generalCrude.createRecord(
-        //   { user_id: newUser.id, username: newUser.username, valid: true },
-        //   "sessions",
-        //   res
-        // );
-        // console.log(session);
-        // let refreshToken = auth.signJWT({ session_id: session.id }, "1d");
-
-        // // set access token in cookie
-        // res.cookie("accessToken", accessToken, {
-        //   maxAge: 300000, // 5 minutes
-        //   httpOnly: true,
-        // });
-        // // set refresh token in cookie
-        // res.cookie("refreshToken", refreshToken, {
-        //   maxAge: 60 * 60 * 24 * 1000, // 1 year
-        //   httpOnly: true,
-        // });
         verifocationEmailHelper.sendVerificationEmail(newUser, res);
         res.status(200).send({ message: "user created successfully" });
         // res.redirect('http://localhost:4200')
@@ -127,64 +101,67 @@ const verifyUserEmail = async (userId, uniqueString, res) => {
     }
 };
 
-const userLogin = async (username, password, res) => {
-    userRepo.getUserByUsernameOrEmail(username, username).then((user) => {
-        if (user) {
-            if (user.verified) {
-                bcrypt.compare(password, user.password).then(async (result) => {
-                    if (result) {
-                        let accessToken = auth.signJWT(
-                            {
-                                username: user.username,
-                                email_address: user.email_address,
-                                user_id: user.id,
-                            },
-                            "5m"
-                        );
-                        let session = await generalCrude.createRecord(
-                            {
-                                user_id: user.id,
-                                username: user.username,
-                                valid: true,
-                            },
-                            "sessions",
-                            res
-                        );
-                        console.log(session);
-                        let refreshToken = auth.signJWT(
-                            { session_id: session.id },
-                            "1d"
-                        );
 
-                        // set access token in cookie
-                        res.cookie("accessToken", accessToken, {
-                            maxAge: 300000 * 12 * 8, // 5 minutes
-                            httpOnly: true,
-                        });
-                        // set refresh token in cookie
-                        res.cookie("refreshToken", refreshToken, {
-                            maxAge: 60 * 60 * 24 * 1000, // 1 year
-                            httpOnly: true,
-                        });
-                        res.status(200).send({
-                            session: session,
-                            message: "user logged in successfully",
-                        });
-                    } else {
-                        console.log("invalid password");
-                        res.status(400).send("invalid username or password");
-                    }
-                });
-            } else {
-                console.log("user not verified");
-                res.status(400).send(
-                    "user not verified, please check your email"
-                );
-            }
-        } else {
-            console.log("invalid username ");
+const userLogin =  async (username, password, res) => {
+  userRepo
+    .getUserByUsernameOrEmail(username, username)
+    .then(  (user) => {
+      if (user) {
+        if(user.verified){
+        bcrypt.compare(password, user.password).then(async (result) => {
+          if (result) {
+            let accessToken = auth.signJWT(
+              {
+                username: user.username,
+                email_address: user.email_address,
+                user_id: user.id,
+              },
+              "5m"
+            );
+            let session = await generalCrude.createRecord(
+              { user_id: user.id, username: user.username,valid: true },
+              "sessions",
+              res
+            );
+            console.log(session);
+            let refreshToken = auth.signJWT({ session_id: session.id }, "1d");
+
+            // set access token in cookie
+            res.cookie("accessToken", accessToken, {
+              maxAge: 300000, // 5 minutes
+              httpOnly: true,
+            });
+            // set refresh token in cookie
+            res.cookie("refreshToken", refreshToken, {
+              maxAge: 60 * 60 * 24 * 1000, // 1 year
+              httpOnly: true,
+            });
+            res.status(200).send({ session : session,message: "user logged in successfully" , signCompleteStatus : user.profile_completion_status});
+          } else {
+            console.log("invalid password")
             res.status(400).send("invalid username or password");
         }
-    });
-};
-module.exports = { userSignIn, verifyUserEmail, userLogin };
+        else{
+          console.log("user not verified")
+          res.status(400).send("user not verified, please check your email");
+        }
+      } else {
+        console.log("invalid username ")
+        res.status(400).send("invalid username or password");
+      }
+    })
+}
+
+const completeSignup = async (req, res ,completeSignupDTO ) => {
+  let user = await generalCrude.getRecordBy("users","username" ,req.user.username);
+  if(!user){
+    res.status(400).send("user not found");
+    return;
+  }
+  let updateUserDTO = userMapper.mapCompleteSingupDTOToUpdateUserDTO(completeSignupDTO);
+  generalCrude.updateRecord("users",user.id,updateUserDTO);
+  res.status(200).send({ message :"user updated successfully"});
+}
+ 
+module.exports = { userSignIn, verifyUserEmail,userLogin ,completeSignup};
+
