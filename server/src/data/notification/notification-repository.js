@@ -9,6 +9,7 @@ const addNotification = async (userId, notificationId) => {
     );
     return result.rows[0];
 };
+
 const getNotifications = async (userId) => {
     let result = await matchaPool.query(
         notificationQuery.getNotificationQuery,

@@ -3,10 +3,11 @@ const crud = require("./data/db/crud");
 const dataBase = require("./data/db/createDB");
 const userRouter = require("./routes/user/route");
 const chatRouter = require("./routes/chat/chat");
+const browseRouter = require("./routes/browse/browse.router");
 const chatService = require("./services/chat/chat.service");
 const notificationRouter = require("./routes/notification/notification.router");
 const authservice = require("./services/auth/jwt.utils");
-const deserializeUser = require("./middlewares/auth/deserializeUser")
+const deserializeUser = require("./middlewares/auth/deserializeUser");
 var cookieParser = require("cookie-parser");
 var bodyParser = require("body-parser");
 var cors = require("cors");
@@ -18,7 +19,7 @@ app.use(cookieParser());
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(express.json())
+app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static("public"));
 app.use(
@@ -50,8 +51,7 @@ app.get("/", (req, res) => {
     console.log("-----------------------");
     console.log(req.cookies);
     res.status(200).send({ name: "hello world" });
-  });
-  
+});
 
 app.use("/chat", chatRouter);
 app.use("/notification", notificationRouter);
@@ -62,6 +62,8 @@ app.get("/start/intiate", async (req, res) => {
     await dataBase.createTables();
     res.status(200).send("data base created succsesfully");
 });
+
+app.use("/browse", browseRouter);
 
 io.on("connection", (socket) => {
     let err;
@@ -109,6 +111,6 @@ io.on("connection", (socket) => {
 app.use((err, req, res, next) => {
     console.log("=============> error handler <=============");
     res.status(500).send(err.message);
-  });
-  
+});
+
 httpServer.listen(port, () => console.log("hello from server port 3000"));
