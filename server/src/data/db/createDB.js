@@ -49,7 +49,7 @@ const createTables = async () => {
     await matchaPool.query(querys.createTable);
     return true;
   } catch (error){
-    console.log(error)
+    console.log("data base throw error : ",error)
     return false;
   }
 };

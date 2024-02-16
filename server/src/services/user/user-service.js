@@ -26,8 +26,11 @@ const userSignIn = async (userWo, res) => {
     const publicIpAddress = firstResponse.data.origin;
     const response = await fetch(`http://ip-api.com/json/${publicIpAddress}`);
     data = await response.json();
+    console.log(data);
     userWo.latitude = data.lat;
     userWo.longitude = data.lon;
+    userWo.city = data.city;
+    userWo.country = data.country;
   }
   userWo.password = await bcrypt.hash(userWo.password, 10);
   newUser = await generalCrude.createRecord(userWo, "users");
@@ -160,4 +163,23 @@ const completeSignup = async (req, res, completeSignupDTO) => {
   res.status(200).send({ message: "user updated successfully" });
 };
 
-module.exports = { userSignIn, verifyUserEmail, userLogin, completeSignup };
+
+const checkSession = async (req, res) => {
+  let session_id = req.query.session_id;
+  if(!req.cookies.accessToken && !req.cookies.refreshToken )
+  {
+    res.status(200).send(false);
+    return
+  }
+  let session = await generalCrude.getRecordBy("sessions", "id", session_id);
+  console.log(session)
+
+  if(!session)
+    res.status(200).send(false);
+  else if(session.valid)
+    res.status(200).send(true);
+  else
+    res.status(200).send(false);
+};
+
+module.exports = { userSignIn, verifyUserEmail, userLogin, completeSignup ,checkSession};

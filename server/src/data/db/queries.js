@@ -16,6 +16,8 @@ const createTable = `
     "fame_rating" INT [],
     "latitude" VARCHAR(255),
     "longitude" VARCHAR(255),
+    "city" VARCHAR(255),
+    "country" VARCHAR(255),
     "verified" BOOLEAN,
     "profile_completion_status" BOOLEAN,
     "is_online" BOOLEAN,
@@ -46,7 +48,6 @@ const createTable = `
     participant_a INT REFERENCES users(id),
     participant_b INT REFERENCES users(id),
     last_message VARCHAR(255),
-    date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     unread_messages INT
   );
   CREATE TABLE IF NOT EXISTS message (
@@ -64,7 +65,6 @@ const createTable = `
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     is_read BOOLEAN
   );
-  )
 `;
 
 

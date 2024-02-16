@@ -97,15 +97,6 @@ router.post(
       completeSingupDTO.images.push(uploadResponse.url);
     }
     userSerivce.completeSignup(req, res, completeSingupDTO);
-    // var uploadResponse = await imagekit.upload({
-    //   file: req.files[0].buffer, // It accepts remote URL, base_64 string or file buffer
-    //   fileName: Date.now()+ req.files[0].originalname, // required
-    //   tags: ["tag1", "tag2"], // optional
-    //   isPrivateFile: false,
-    // }).catch((err) => {
-    //   console.log(err);
-    // });
-    // console.log(uploadResponse);
   }
 );
 
@@ -117,4 +108,9 @@ router.post('/completeSignupStatus',requireUser,async (req,res)=>{
   }
   res.status(200).send({signCompleteStatus : user.profile_completion_status});
 })
+
+router.get("/checkSession", async (req, res) => {
+  console.log("check session called");
+  userSerivce.checkSession(req, res);
+});
 module.exports = router;

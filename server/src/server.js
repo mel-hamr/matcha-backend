@@ -6,7 +6,7 @@ const chatRouter = require("./routes/chat/chat");
 const chatService = require("./services/chat/chat.service");
 const notificationRouter = require("./routes/notification/notification.router");
 const authservice = require("./services/auth/jwt.utils");
-const deserializeUser = require("./middlewares/auth/deserializeUser")
+const deserializer = require("./middlewares/auth/deserializeUser")
 var cookieParser = require("cookie-parser");
 var bodyParser = require("body-parser");
 var cors = require("cors");
@@ -36,7 +36,10 @@ app.use((req, res, next) => {
     );
     next();
 });
-app.use(deserializeUser);
+
+
+
+app.use(deserializer.deserializerFilter(deserializer.deserializeUser));
 
 const httpServer = require("http").createServer(app);
 
@@ -48,7 +51,7 @@ const io = require("socket.io")(httpServer, {
 app.use("/user", userRouter);
 app.get("/", (req, res) => {
     console.log("-----------------------");
-    console.log(req.cookies);
+    // console.log(req.cookies);
     res.status(200).send({ name: "hello world" });
   });
   

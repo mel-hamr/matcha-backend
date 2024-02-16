@@ -1,10 +1,15 @@
 const { verifyJWT, signJWT } = require("../../services/auth/jwt.utils");
 const generalCrude = require("../../data/db/crud");
+const e = require("express");
 
 async function deserializeUser(req, res, next) {
   const { accessToken, refreshToken } = req.cookies;
-  console.log("accessToken", accessToken);
-  console.log("refreshToken", refreshToken);
+  if (!accessToken && !refreshToken) {
+    res.status(401).send("unauthorized");
+    return;
+  }
+  // console.log("accessToken", accessToken);
+  // console.log("refreshToken", refreshToken);
   if (!accessToken) {
     if (refreshToken) {
       const result = verifyJWT(refreshToken);
@@ -55,7 +60,10 @@ async function deserializeUser(req, res, next) {
 
   // @ts-ignore
   //   const session = getSession(refresh.sessionId);
-  const session = await generalCrude.getRecordById("sessions", refresh.sessionId);
+  const session = await generalCrude.getRecordById(
+    "sessions",
+    refresh.sessionId
+  );
   console.log(session);
   if (!session) {
     return next();
@@ -74,4 +82,21 @@ async function deserializeUser(req, res, next) {
   return next();
 }
 
-module.exports = deserializeUser;
+// array of paths that do not require deserialization
+const PATHS = ["/user/login", "/user/signup" , "/start/intiate"];
+
+var deserializerFilter = function (middleware) {
+  return function (req, res, next) {
+    console.log("path", req.path);
+    if (PATHS.includes(req.path)) {
+      return next();
+    } else if (req.path.includes("/user/verify-email")) {
+      return next();
+    } else if (req.path.includes("/user/verified")) {
+      return next();
+    } else {
+      return middleware(req, res, next);
+    }
+  };
+};
+module.exports = { deserializeUser, deserializerFilter };
