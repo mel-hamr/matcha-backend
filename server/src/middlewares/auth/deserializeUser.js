@@ -4,90 +4,117 @@ const e = require("express");
 
 async function deserializeUser(req, res, next) {
   const { accessToken, refreshToken } = req.cookies;
-  if (!accessToken && !refreshToken) {
-    res.status(401).send("unauthorized");
-    return;
-  }
-  // console.log("accessToken", accessToken);
-  // console.log("refreshToken", refreshToken);
-  if (!accessToken) {
-    if (refreshToken) {
-      const result = verifyJWT(refreshToken);
-      console.log("result", result);
 
-      if (result.expired == true) {
+  if (!accessToken && !refreshToken) {
+    return res.status(401).send("unauthorized");
+  }
+  else {
+
+    if (accessToken) {
+      const { payload, expired } = verifyJWT(accessToken);
+      if (expired == false && payload) 
+      {
+        req.user = payload;
         return next();
+      }
+    }
+    
+    if (!accessToken || (expired == true && refreshToken)) {
+      const decodedRefreshToken = verifyJWT(refreshToken);
+      if (decodedRefreshToken.expired == true) {
+        return res.status(401).send("unauthorized");
       }
       const session = await generalCrude.getRecordById(
         "sessions",
-        result.payload.session_id
-      );
-      console.log("session", session);
-      if (!session || !session.valid) {
-        return next();
+        decodedRefreshToken.payload.session_id
+        );
+        if (!session || !session.valid) {
+          return res.status(401).send("unauthorized");
+        }
+        const newAccessToken = signJWT(session, "5m");
+        res.cookie("accessToken", newAccessToken, {
+          maxAge: 300000,
+          httpOnly: true,
+        });
+        req.user = verifyJWT(newAccessToken).payload;
       }
 
-      const newAccessToken = signJWT(session, "5m");
-
-      res.cookie("accessToken", newAccessToken, {
-        maxAge: 300000, // 5 minutes
-        httpOnly: true,
-      });
-
-      // @ts-ignore
-      req.user = verifyJWT(newAccessToken).payload;
+      return next();
     }
-    return next();
-  }
+      
+      // if (!accessToken) {
+  //   if (refreshToken) {
+  //     const decodedRefreshToken = verifyJWT(refreshToken);
+  //     console.log("decodedRefreshToken", decodedRefreshToken);
 
-  const { payload, expired } = verifyJWT(accessToken);
+  //     if (decodedRefreshToken.expired == true) {
+  //       return res.status(401).send("unauthorized");
+  //     }
+  //     const session = await generalCrude.getRecordById(
+  //       "sessions",
+  //       decodedRefreshToken.payload.session_id
+  //     );
+  //     console.log("session", session);
+  //     if (!session || !session.valid) {
+  //       return res.status(401).send("unauthorized");
+  //     }
+  //     const newAccessToken = signJWT(session, "5m");
+  //     res.cookie("accessToken", newAccessToken, {
+  //       maxAge: 300000,
+  //       httpOnly: true,
+  //     });
+  //     // @ts-ignore
+  //     req.user = verifyJWT(newAccessToken).payload;
+  //   }
+  //   return res.status(401).send("unauthorized");
+  // }
 
-  // For a valid access token
-  if (payload) {
-    // @ts-ignore
-    req.user = payload;
-    return next();
-  }
+  // const { payload, expired } = verifyJWT(accessToken);
+
+  // // For a valid access token
+  // if (payload) {
+  //   // @ts-ignore
+  //   req.user = payload;
+  //   return next();
+  // }
 
   // expired but valid access token
+  // const { payload: refresh } =
+  //   expired && refreshToken ? verifyJWT(refreshToken) : { payload: null };
 
-  const { payload: refresh } =
-    expired && refreshToken ? verifyJWT(refreshToken) : { payload: null };
+  // if (!refresh) {
+  //   return next();
+  // }
 
-  if (!refresh) {
-    return next();
-  }
+  // // @ts-ignore
+  // //   const session = getSession(refresh.sessionId);
+  // const session = await generalCrude.getRecordById(
+  //   "sessions",
+  //   refresh.sessionId
+  // );
+  // console.log(session);
+  // if (!session) {
+  //   return next();
+  // }
 
-  // @ts-ignore
-  //   const session = getSession(refresh.sessionId);
-  const session = await generalCrude.getRecordById(
-    "sessions",
-    refresh.sessionId
-  );
-  console.log(session);
-  if (!session) {
-    return next();
-  }
+  // const newAccessToken = signJWT(session, "5m");
 
-  const newAccessToken = signJWT(session, "5m");
+  // res.cookie("accessToken", newAccessToken, {
+  //   maxAge: 300000, // 5 minutes
+  //   httpOnly: true,
+  // });
 
-  res.cookie("accessToken", newAccessToken, {
-    maxAge: 300000, // 5 minutes
-    httpOnly: true,
-  });
+  // // @ts-ignore
+  // req.user = verifyJWT(newAccessToken).payload;
 
-  // @ts-ignore
-  req.user = verifyJWT(newAccessToken).payload;
-
-  return next();
+  // return next();
 }
 
 // array of paths that do not require deserialization
-const PATHS = ["/user/login", "/user/signup" , "/start/intiate"];
+const PATHS = ["/user/login", "/user/signup", "/start/intiate"];
 
 var deserializerFilter = function (middleware) {
   return function (req, res, next) {
-    console.log("path", req.path);
     if (PATHS.includes(req.path)) {
       return next();
     } else if (req.path.includes("/user/verify-email")) {
