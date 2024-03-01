@@ -67,7 +67,7 @@ app.use("/browse", browseRouter);
 
 io.on("connection", (socket) => {
     let err;
-
+    // socket id
     socket.join(socket.handshake.query.roomID.toString());
 
     socket.on("sendFriendMessage", (message) => {
