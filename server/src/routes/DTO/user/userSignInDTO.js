@@ -7,6 +7,8 @@ class userSignInDTO {
     this.password = body.password;
     this.longitude = body.longitude;
     this.latitude = body.latitude;
+    this.city = body.city;
+    this.country = body.country;
     this.fame_rating = [];
     this.verified = false;
     this.profile_completion_status = false;

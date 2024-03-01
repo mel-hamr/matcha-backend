@@ -26,8 +26,11 @@ const userSignIn = async (userWo, res) => {
     const publicIpAddress = firstResponse.data.origin;
     const response = await fetch(`http://ip-api.com/json/${publicIpAddress}`);
     data = await response.json();
+    console.log(data);
     userWo.latitude = data.lat;
     userWo.longitude = data.lon;
+    userWo.city = data.city;
+    userWo.country = data.country;
   }
   userWo.password = await bcrypt.hash(userWo.password, 10);
   newUser = await generalCrude.createRecord(userWo, "users");
@@ -136,9 +139,8 @@ const userLogin = async (username, password, res) => {
         console.log("user not verified");
         res.status(400).send("user not verified, please check your email");
       }
-    }
-    else {
-      console.log("invalid username ")
+    } else {
+      console.log("invalid username ");
       res.status(400).send("invalid username or password");
     }
   });
@@ -160,4 +162,31 @@ const completeSignup = async (req, res, completeSignupDTO) => {
   res.status(200).send({ message: "user updated successfully" });
 };
 
-module.exports = { userSignIn, verifyUserEmail, userLogin, completeSignup };
+const checkSession = async (req, res) => {
+  let session_id = req.query.session_id;
+  if (!session_id || !req.cookies.accessToken && !req.cookies.refreshToken) {
+    return res.status(200).send(false);
+  }
+  let session = await generalCrude.getRecordBy("sessions", "id", session_id);
+  // console.log(session);
+
+  if (!session) res.status(200).send(false);
+  else if (session.valid) res.status(200).send(true);
+  else res.status(200).send(false);
+};
+
+const getUserByUsername = async (res, username) => {
+  const user = await generalCrude.getRecordBy("users", "username", username);
+  console.log(user);
+  if (!user) res.status(400).send("user not found");
+  else res.status(200).send(user);
+};             
+
+module.exports = {
+  userSignIn,
+  verifyUserEmail,
+  userLogin,
+  completeSignup,
+  checkSession,
+  getUserByUsername,
+};

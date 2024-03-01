@@ -5,7 +5,7 @@ const userSerivce = require("../../services/user/user-service");
 const path = require("path");
 const userSignInDTO = require("../DTO/user/userSignInDTO");
 const CompleteSignupDTO = require("../DTO/user/completeSignupDTO");
-const requireUser = require("../../middlewares/auth/requireUser");
+// const requireUser = require("../../middlewares/auth/requireUser");
 
 ///// multer
 const multer = require("multer");
@@ -28,32 +28,32 @@ var imagekit = new ImageKit({
 /////// routes
 
 router.post("/login", async (req, res) => {
-    let { username, password } = req.body;
-    if (username && password) userSerivce.userLogin(username, password, res);
-    else res.status(400).send("Please enter username and password");
+  let { username, password } = req.body;
+  if (username && password) userSerivce.userLogin(username, password, res);
+  else res.status(400).send("Please enter username and password");
 });
 
 router.post("/signup", async (req, res) => {
-    userDTO = new userSignInDTO(req.body);
-    let { status, message } = userDTO.checkAllFields(res);
-    console.log(userDTO);
-    if (status) {
-        await userSerivce.userSignIn(userDTO, res);
-    } else res.status(400).send(message);
+  userDTO = new userSignInDTO(req.body);
+  let { status, message } = userDTO.checkAllFields(res);
+  console.log(userDTO);
+  if (status) {
+    await userSerivce.userSignIn(userDTO, res);
+  } else res.status(400).send(message);
 });
 
 router.get("/getUser", async (req, res) => {
-    res.send(await generalCrude.getRecordById("users", req.body.id));
+  res.send(await generalCrude.getRecordById("users", req.body.id));
 });
 
 router.get("/verify-email/:id/:uniqueString", async (req, res) => {
-    const id = req.params.id;
-    const uniqueString = req.params.uniqueString;
-    await userSerivce.verifyUserEmail(id, uniqueString, res);
+  const id = req.params.id;
+  const uniqueString = req.params.uniqueString;
+  await userSerivce.verifyUserEmail(id, uniqueString, res);
 });
 
 router.get("/verified", (req, res) => {
-    res.sendFile(path.join(__dirname + "../../../common/views/verified.html"));
+  res.sendFile(path.join(__dirname + "../../../common/views/verified.html"));
 });
 
 router.post("/getVerification", async (req, res) => {
@@ -68,7 +68,6 @@ router.post("/getVerification", async (req, res) => {
 
 router.post(
   "/test",
-  requireUser,
   upload.array("photos", 5),
   async (req, res) => {
     try {
@@ -97,24 +96,30 @@ router.post(
       completeSingupDTO.images.push(uploadResponse.url);
     }
     userSerivce.completeSignup(req, res, completeSingupDTO);
-    // var uploadResponse = await imagekit.upload({
-    //   file: req.files[0].buffer, // It accepts remote URL, base_64 string or file buffer
-    //   fileName: Date.now()+ req.files[0].originalname, // required
-    //   tags: ["tag1", "tag2"], // optional
-    //   isPrivateFile: false,
-    // }).catch((err) => {
-    //   console.log(err);
-    // });
-    // console.log(uploadResponse);
   }
 );
 
-router.post('/completeSignupStatus',requireUser,async (req,res)=>{
-  let user = await generalCrude.getRecordBy("users","username" ,req.user.username);
-  if(!user){
+router.post("/completeSignupStatus", async (req, res) => {
+  
+  let user = await generalCrude.getRecordBy(
+    "users",
+    "username",
+    req.user.username
+  );
+  if (!user) {
     res.status(400).send("user not found");
     return;
   }
-  res.status(200).send({signCompleteStatus : user.profile_completion_status});
-})
+  res.status(200).send({ signCompleteStatus: user.profile_completion_status });
+});
+
+router.get("/checkSession", async (req, res) => {
+  console.log("check session called");
+  userSerivce.checkSession(req, res);
+});
+
+router.get("/",  (req, res) => {
+   userSerivce.getUserByUsername(res, req.query.username);
+});
+
 module.exports = router;
