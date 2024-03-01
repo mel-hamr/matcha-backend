@@ -21,7 +21,7 @@ const getMessages = async (cnvId, userID) => {
     let conversation = await chatRepository.getMessages(cnvId);
     conversation = conversation.map((message) => {
         // if(message.sender === userID)
-        console.log("sender", userID);
+        // console.log("sender", userID);
         return {
             id: message.id,
             message: message.text,
