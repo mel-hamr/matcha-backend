@@ -7,7 +7,7 @@ const browseRouter = require("./routes/browse/browse.router");
 const chatService = require("./services/chat/chat.service");
 const notificationRouter = require("./routes/notification/notification.router");
 // const userMiddleware = require("./middlewares/auth/requireUser");
-const deserializer = require("./middlewares/auth/deserializeUser")
+const deserializer = require("./middlewares/auth/deserializeUser");
 var cookieParser = require("cookie-parser");
 var bodyParser = require("body-parser");
 var cors = require("cors");
@@ -38,8 +38,6 @@ app.use((req, res, next) => {
     next();
 });
 
-
-
 app.use(deserializer.deserializerFilter(deserializer.deserializeUser));
 
 const httpServer = require("http").createServer(app);
@@ -67,7 +65,9 @@ app.get("/start/intiate", async (req, res) => {
 });
 
 app.use("/browse", browseRouter);
-
+// io.use((socket, next) => {
+//     return next(new Error("unauthorized"));
+// });
 io.on("connection", (socket) => {
     let err;
     // socket id
@@ -106,6 +106,20 @@ io.on("connection", (socket) => {
             //     .emit("receiveFriendMessage", message);
         }
     });
+
+    socket.on("userVisited", (data) => {
+        console.log("viewProfileFriend", data);
+        // viewProfileFriend { userId: 8, userName: 'Thor' }
+        socket
+            .to(data.userId.toString())
+            .emit("profileViwed", `${data.userName} visited your profile`);
+    });
+
+    socket.on("likeFriendProfile", (data) => {
+        console.log("likeFriend", data);
+        socket.to(data.receiver_id.toString()).emit("likeFriend", data);
+    });
+
     socket.on("disconnect", () => {
         console.log("a user disconnected!");
     });

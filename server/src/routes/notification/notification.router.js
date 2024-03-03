@@ -13,6 +13,7 @@ notificationRouter.post("/add", async (req, res) => {
 });
 
 notificationRouter.put("/resetAllRead", async (req, res) => {
+    console.log('resetAllRead');
     const userId = 1;
     console.log('resetAllRead', userId);
     const notification = await notificationService.resetNotificationRead(
