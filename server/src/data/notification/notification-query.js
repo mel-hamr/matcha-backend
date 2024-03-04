@@ -1,7 +1,7 @@
 const addNotificationQuery = `
-INSERT INTO public.notifacation (user_id, type, message, is_read) VALUES ($1, $2, $3, $4) WHERE user_id = $1`;
+INSERT INTO public.notifacation (user_id, type, text) VALUES ($1, $2, $3) `;
 
-const getNotificationQuery = `
+const getNotificationQuery = ` 
 SELECT * FROM public.notifacation WHERE user_id = $1 ORDER BY created_at DESC
 `;
 

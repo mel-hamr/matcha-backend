@@ -5,6 +5,8 @@ const userRouter = require("./routes/user/route");
 const chatRouter = require("./routes/chat/chat");
 const browseRouter = require("./routes/browse/browse.router");
 const chatService = require("./services/chat/chat.service");
+const notificationService = require("./services/notification/notification.service");
+
 const notificationRouter = require("./routes/notification/notification.router");
 // const userMiddleware = require("./middlewares/auth/requireUser");
 const deserializer = require("./middlewares/auth/deserializeUser");
@@ -108,8 +110,18 @@ io.on("connection", (socket) => {
     });
 
     socket.on("userVisited", (data) => {
-        console.log("viewProfileFriend", data);
+        console.log(
+            "viewProfileFriend",
+            data.userId,
+            "visited_profile",
+            `${data.userName} visited your profile`
+        );
         // viewProfileFriend { userId: 8, userName: 'Thor' }
+        notificationService.addNotification(
+            data.userId,
+            "visited_profile",
+            `${data.userName} visited your profile`
+        );
         socket
             .to(data.userId.toString())
             .emit("profileViwed", `${data.userName} visited your profile`);

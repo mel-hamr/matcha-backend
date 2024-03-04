@@ -2,10 +2,10 @@ const client = require("../../data/db/createDB");
 const notificationQuery = require("./notification-query");
 const matchaPool = client.matchaPool;
 
-const addNotification = async (userId, notificationId) => {
+const addNotification = async (userId, type, text) => {
     let result = await matchaPool.query(
         notificationQuery.addNotificationQuery,
-        [userId]
+        [userId, type, text]
     );
     return result.rows[0];
 };
@@ -47,5 +47,5 @@ module.exports = {
     getNotificationCount,
     getNotifications,
     updateNotification,
-    resetNotificationRead
+    resetNotificationRead,
 };

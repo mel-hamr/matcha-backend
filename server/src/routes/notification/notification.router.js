@@ -4,18 +4,18 @@ const notificationService = require("../../services/notification/notification.se
 
 notificationRouter.post("/add", async (req, res) => {
     const userId = req.query.userId;
-    const notificationId = req.body.notificationId;
     const notification = await notificationService.addNotification(
         userId,
-        notificationId
+        type,
+        text
     );
     res.status(200).send(notification);
 });
 
 notificationRouter.put("/resetAllRead", async (req, res) => {
-    console.log('resetAllRead');
+    console.log("resetAllRead");
     const userId = 1;
-    console.log('resetAllRead', userId);
+    console.log("resetAllRead", userId);
     const notification = await notificationService.resetNotificationRead(
         userId
     );
