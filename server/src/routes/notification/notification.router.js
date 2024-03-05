@@ -12,6 +12,14 @@ notificationRouter.post("/add", async (req, res) => {
     res.status(200).send(notification);
 });
 
+notificationRouter.delete("/delete", async (req, res) => {
+    const notificationsId = req.query.notificationId;
+    const notification = await notificationService.deleteNotification(
+        notificationsId
+    );
+    res.status(200).send(notification);
+});
+
 notificationRouter.put("/resetAllRead", async (req, res) => {
     console.log("resetAllRead");
     const userId = 1;

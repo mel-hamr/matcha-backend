@@ -10,6 +10,14 @@ const addNotification = async (userId, type, text) => {
     return result.rows[0];
 };
 
+const deleteNotification = async (notificationsId) => {
+    let result = await matchaPool.query(
+        notificationQuery.delteNotificationsQuery,
+        [notificationsId]
+    );
+    return result.rows[0];
+};
+
 const getNotifications = async (userId) => {
     let result = await matchaPool.query(
         notificationQuery.getNotificationQuery,
@@ -48,4 +56,5 @@ module.exports = {
     getNotifications,
     updateNotification,
     resetNotificationRead,
+    deleteNotification,
 };

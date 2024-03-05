@@ -1,6 +1,10 @@
 const addNotificationQuery = `
 INSERT INTO public.notifacation (user_id, type, text) VALUES ($1, $2, $3) `;
 
+const delteNotificationsQuery = `
+    DELETE FROM public.notifacation WHERE id = ANY($1)
+`;
+
 const getNotificationQuery = ` 
 SELECT * FROM public.notifacation WHERE user_id = $1 ORDER BY created_at DESC
 `;
@@ -24,4 +28,5 @@ module.exports = {
     getNotificationQuery,
     notificationReadQuery,
     notifiationAllReadedQuery,
+    delteNotificationsQuery
 };
