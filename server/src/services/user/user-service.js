@@ -177,7 +177,7 @@ const checkSession = async (req, res) => {
 
 const getUserByUsername = async (res, username) => {
   const user = await generalCrude.getRecordBy("users", "username", username);
-  console.log(user);
+  // console.log(user);
   if (!user) res.status(400).send("user not found");
   else res.status(200).send(user);
 };             

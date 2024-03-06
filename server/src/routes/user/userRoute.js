@@ -66,41 +66,36 @@ router.post("/getVerification", async (req, res) => {
   });
 });
 
-router.post(
-  "/test",
-  upload.array("photos", 5),
-  async (req, res) => {
-    try {
-      req.body.tags = JSON.parse(req.body.tags);
-    } catch (err) {
-      res.status(400).send("invalid tags format");
-      return;
-    }
-    let completeSingupDTO = new CompleteSignupDTO(req.body, req.files);
-    // console.log(completeSingupDTO);
-    let { status, message } = completeSingupDTO.checkAllFields();
-    if (status == false) {
-      res.status(400).send(message);
-      return;
-    }
-    for (let photo of completeSingupDTO.photos) {
-      var uploadResponse = await imagekit
-        .upload({
-          file: photo.buffer, // It accepts remote URL, base_64 string or file buffer
-          fileName: Date.now() + photo.originalname, // required
-          isPrivateFile: false,
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-      completeSingupDTO.images.push(uploadResponse.url);
-    }
-    userSerivce.completeSignup(req, res, completeSingupDTO);
+router.post("/test", upload.array("photos", 5), async (req, res) => {
+  try {
+    req.body.tags = JSON.parse(req.body.tags);
+  } catch (err) {
+    res.status(400).send("invalid tags format");
+    return;
   }
-);
+  let completeSingupDTO = new CompleteSignupDTO(req.body, req.files);
+  // console.log(completeSingupDTO);
+  let { status, message } = completeSingupDTO.checkAllFields();
+  if (status == false) {
+    res.status(400).send(message);
+    return;
+  }
+  for (let photo of completeSingupDTO.photos) {
+    var uploadResponse = await imagekit
+      .upload({
+        file: photo.buffer, // It accepts remote URL, base_64 string or file buffer
+        fileName: Date.now() + photo.originalname, // required
+        isPrivateFile: false,
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+    completeSingupDTO.images.push(uploadResponse.url);
+  }
+  userSerivce.completeSignup(req, res, completeSingupDTO);
+});
 
 router.post("/completeSignupStatus", async (req, res) => {
-  
   let user = await generalCrude.getRecordBy(
     "users",
     "username",
@@ -114,12 +109,12 @@ router.post("/completeSignupStatus", async (req, res) => {
 });
 
 router.get("/checkSession", async (req, res) => {
-  console.log("check session called");
+  // console.log("check session called");
   userSerivce.checkSession(req, res);
 });
 
-router.get("/",  (req, res) => {
-   userSerivce.getUserByUsername(res, req.query.username);
+router.get("/", (req, res) => {
+  userSerivce.getUserByUsername(res, req.query.username);
 });
 
 module.exports = router;
