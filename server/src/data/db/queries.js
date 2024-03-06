@@ -30,6 +30,18 @@ const createTable = `
     view_id INT REFERENCES users(id),
     UNIQUE (user_id, view_id)
   );
+  CREATE TABLE IF NOT EXISTS "matchs" (
+    id SERIAL PRIMARY KEY,
+    user1_id INT REFERENCES users(id),
+    user2_id INT REFERENCES users(id),
+    UNIQUE (user1_id, user2_id)
+  );
+  CREATE TABLE IF NOT EXISTS "match_requests" (
+    id SERIAL PRIMARY KEY,
+    sender_id INT REFERENCES users(id),
+    reciver_id INT REFERENCES users(id),
+    UNIQUE (sender_id, reciver_id)
+  );
   CREATE TABLE IF NOT EXISTS sessions (
     id SERIAL PRIMARY KEY,
     user_id INT REFERENCES users(id),
