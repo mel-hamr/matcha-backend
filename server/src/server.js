@@ -51,7 +51,6 @@ const io = require("socket.io")(httpServer, {
 // body parser
 app.use("/user", userRouter);
 app.get("/", (req, res) => {
-    console.log("-----------------------");
     // console.log(req.cookies);
     res.status(200).send({ name: "hello world" });
 });
@@ -110,12 +109,7 @@ io.on("connection", (socket) => {
     });
 
     socket.on("userVisited", (data) => {
-        console.log(
-            "viewProfileFriend",
-            data.userId,
-            "visited_profile",
-            `${data.userName} visited your profile`
-        );
+   
         // viewProfileFriend { userId: 8, userName: 'Thor' }
         notificationService.addNotification(
             data.userId,
@@ -128,7 +122,6 @@ io.on("connection", (socket) => {
     });
 
     socket.on("likeFriendProfile", (data) => {
-        console.log("likeFriend", data);
         socket.to(data.receiver_id.toString()).emit("likeFriend", data);
     });
 

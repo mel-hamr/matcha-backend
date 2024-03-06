@@ -5,6 +5,10 @@ const delteNotificationsQuery = `
     DELETE FROM public.notifacation WHERE id = ANY($1)
 `;
 
+const deleteNotificatonQuery = `
+DELETE FROM public.notifacation WHERE id = $1
+`;
+
 const getNotificationQuery = ` 
 SELECT * FROM public.notifacation WHERE user_id = $1 ORDER BY created_at DESC
 `;
@@ -28,5 +32,6 @@ module.exports = {
     getNotificationQuery,
     notificationReadQuery,
     notifiationAllReadedQuery,
+    deleteNotificatonQuery,
     delteNotificationsQuery
 };

@@ -5,7 +5,6 @@ const e = require("express");
 async function deserializeUser(req, res, next) {
 
     const { accessToken, refreshToken } = req.cookies;
-    console.log("middleware", accessToken, refreshToken);
 
     if (!accessToken && !refreshToken) {
         return res.status(401).send("unauthorized");

@@ -12,6 +12,15 @@ notificationRouter.post("/add", async (req, res) => {
     res.status(200).send(notification);
 });
 
+notificationRouter.delete("", async (req, res) => {
+    const notificationId = req.query.notificationId;
+    const notification = await notificationService.deleteNotification(
+        notificationId
+    );
+    console.log('notification deleted', notification);
+    res.status(200).send(notification);
+});
+
 notificationRouter.delete("/delete", async (req, res) => {
     const notificationsId = req.query.notificationId;
     const notification = await notificationService.deleteNotification(

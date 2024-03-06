@@ -4,6 +4,10 @@ const addNotification = async (userId, type, text) => {
     return await notificationRepository.addNotification(userId, type, text);
 };
 
+const deleteNotification = async (notificationId) => {
+    return await notificationRepository.deleteNotification(notificationId);
+}
+
 const deleteNotifications = async (notificationsId) => {
     return await notificationRepository.deleteNotification(notificationsId);
 };
@@ -37,5 +41,6 @@ module.exports = {
     getNotifications,
     updateNotification,
     resetNotificationRead,
+    deleteNotification,
     deleteNotifications,
 };

@@ -12,10 +12,10 @@ const addNotification = async (userId, type, text) => {
 
 const deleteNotification = async (notificationsId) => {
     let result = await matchaPool.query(
-        notificationQuery.delteNotificationsQuery,
+        notificationQuery.deleteNotificatonQuery,
         [notificationsId]
     );
-    return result.rows[0];
+    return notificationsId;
 };
 
 const getNotifications = async (userId) => {
