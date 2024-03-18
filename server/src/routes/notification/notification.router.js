@@ -4,17 +4,35 @@ const notificationService = require("../../services/notification/notification.se
 
 notificationRouter.post("/add", async (req, res) => {
     const userId = req.query.userId;
-    const notificationId = req.body.notificationId;
     const notification = await notificationService.addNotification(
         userId,
+        type,
+        text
+    );
+    res.status(200).send(notification);
+});
+
+notificationRouter.delete("", async (req, res) => {
+    const notificationId = req.query.notificationId;
+    const notification = await notificationService.deleteNotification(
         notificationId
+    );
+    console.log('notification deleted', notification);
+    res.status(200).send(notification);
+});
+
+notificationRouter.delete("/delete", async (req, res) => {
+    const notificationsId = req.query.notificationId;
+    const notification = await notificationService.deleteNotification(
+        notificationsId
     );
     res.status(200).send(notification);
 });
 
 notificationRouter.put("/resetAllRead", async (req, res) => {
+    console.log("resetAllRead");
     const userId = 1;
-    console.log('resetAllRead', userId);
+    console.log("resetAllRead", userId);
     const notification = await notificationService.resetNotificationRead(
         userId
     );

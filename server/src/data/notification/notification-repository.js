@@ -2,13 +2,22 @@ const client = require("../../data/db/createDB");
 const notificationQuery = require("./notification-query");
 const matchaPool = client.matchaPool;
 
-const addNotification = async (userId, notificationId) => {
+const addNotification = async (userId, type, text) => {
     let result = await matchaPool.query(
         notificationQuery.addNotificationQuery,
-        [userId]
+        [userId, type, text]
     );
     return result.rows[0];
 };
+
+const deleteNotification = async (notificationsId) => {
+    let result = await matchaPool.query(
+        notificationQuery.deleteNotificatonQuery,
+        [notificationsId]
+    );
+    return notificationsId;
+};
+
 const getNotifications = async (userId) => {
     let result = await matchaPool.query(
         notificationQuery.getNotificationQuery,
@@ -46,5 +55,6 @@ module.exports = {
     getNotificationCount,
     getNotifications,
     updateNotification,
-    resetNotificationRead
+    resetNotificationRead,
+    deleteNotification,
 };

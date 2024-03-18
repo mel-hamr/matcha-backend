@@ -7,90 +7,101 @@ const axios = require("axios");
 const userMapper = require("./helper/user-mapper");
 
 const userSignIn = async (userWo, res) => {
-  let newUser;
-  let user;
-  user = await userRepo.getUserByUsernameOrEmail(
-    userWo.username,
-    userWo.email_address
-  );
-  if (user) {
-    if (user.email_address == userWo.email_address)
-      res.status(400).send("email address already used");
-    else if (user.username == userWo.username)
-      res.status(400).send("username already used");
-    return;
-  }
+    let newUser;
+    let user;
+    user = await userRepo.getUserByUsernameOrEmail(
+        userWo.username,
+        userWo.email_address
+    );
+    if (user) {
+        if (user.email_address == userWo.email_address)
+            res.status(400).send("email address already used");
+        else if (user.username == userWo.username)
+            res.status(400).send("username already used");
+        return;
+    }
 
-  if (!userWo.lantiude && !userWo.longitude) {
-    const firstResponse = await axios.get("https://httpbin.org/ip");
-    const publicIpAddress = firstResponse.data.origin;
-    const response = await fetch(`http://ip-api.com/json/${publicIpAddress}`);
-    data = await response.json();
-    console.log(data);
-    userWo.latitude = data.lat;
-    userWo.longitude = data.lon;
-    userWo.city = data.city;
-    userWo.country = data.country;
-  }
-  userWo.password = await bcrypt.hash(userWo.password, 10);
-  newUser = await generalCrude.createRecord(userWo, "users");
-  if (newUser) {
-    console.log("====================================");
-    console.log(newUser);
-    verifocationEmailHelper.sendVerificationEmail(newUser, res);
-    res.status(200).send({ message: "user created successfully" });
-    // res.redirect('http://localhost:4200')
-  } else {
-    res.status(400).send("error happend while creating user");
-    return;
-  }
+    if (!userWo.lantiude && !userWo.longitude) {
+        const firstResponse = await axios.get("https://httpbin.org/ip");
+        const publicIpAddress = firstResponse.data.origin;
+        const response = await fetch(
+            `http://ip-api.com/json/${publicIpAddress}`
+        );
+        data = await response.json();
+        // console.log(data);
+        userWo.latitude = data.lat;
+        userWo.longitude = data.lon;
+        userWo.city = data.city;
+        userWo.country = data.country;
+    }
+    userWo.password = await bcrypt.hash(userWo.password, 10);
+    newUser = await generalCrude.createRecord(userWo, "users");
+    if (newUser) {
+        console.log("====================================");
+        // console.log(newUser);
+        verifocationEmailHelper.sendVerificationEmail(newUser, res);
+        res.status(200).send({ message: "user created successfully" });
+        // res.redirect('http://localhost:4200')
+    } else {
+        res.status(400).send("error happend while creating user");
+        return;
+    }
 };
 
 const verifyUserEmail = async (userId, uniqueString, res) => {
-  let user_verification = await generalCrude.getRecordBy(
-    "user_verification",
-    "user_id",
-    userId
-  );
-  // check if user verification record exists
-  if (user_verification) {
-    //check if user verification record is expiret
-    if (user_verification.expires_at < new Date()) {
-      generalCrude.deleteRecord("user_verification", user_verification.id);
-      generalCrude.deleteRecord("users", userId);
-      let message = "Verification link has expired. Please sign up again.";
-      res.redirect(`/user/verified/?error=true&message=${message}`);
-    }
-    // if user verification record is not expired
-    else {
-      bcrypt
-        .compare(uniqueString, user_verification.unique_string)
-        .then((result) => {
-          if (result) {
-            generalCrude.updateRecord("users", userId, {
-              verified: true,
-            });
+    let user_verification = await generalCrude.getRecordBy(
+        "user_verification",
+        "user_id",
+        userId
+    );
+    // check if user verification record exists
+    if (user_verification) {
+        //check if user verification record is expiret
+        if (user_verification.expires_at < new Date()) {
             generalCrude.deleteRecord(
-              "user_verification",
-              user_verification.id
+                "user_verification",
+                user_verification.id
             );
-            res.redirect(`/user/verified/`);
-          } else {
+            generalCrude.deleteRecord("users", userId);
             let message =
-              " invalid verification details passed. Check your inbox";
+                "Verification link has expired. Please sign up again.";
             res.redirect(`/user/verified/?error=true&message=${message}`);
-          }
-        })
-        .catch((error) => {
-          let message = "An error occured while comapring unique string";
-          res.redirect(`/user/verified/?error=true&message=${message}`);
-        });
+        }
+        // if user verification record is not expired
+        else {
+            bcrypt
+                .compare(uniqueString, user_verification.unique_string)
+                .then((result) => {
+                    if (result) {
+                        generalCrude.updateRecord("users", userId, {
+                            verified: true,
+                        });
+                        generalCrude.deleteRecord(
+                            "user_verification",
+                            user_verification.id
+                        );
+                        res.redirect(`/user/verified/`);
+                    } else {
+                        let message =
+                            " invalid verification details passed. Check your inbox";
+                        res.redirect(
+                            `/user/verified/?error=true&message=${message}`
+                        );
+                    }
+                })
+                .catch((error) => {
+                    let message =
+                        "An error occured while comapring unique string";
+                    res.redirect(
+                        `/user/verified/?error=true&message=${message}`
+                    );
+                });
+        }
+    } else {
+        let message =
+            "Account record doesn't exist or has been verified already. Plaese sign up or login.";
+        res.redirect(`/user/verified/?error=true&message=${message}`);
     }
-  } else {
-    let message =
-      "Account record doesn't exist or has been verified already. Plaese sign up or login.";
-    res.redirect(`/user/verified/?error=true&message=${message}`);
-  }
 };
 
 const userLogin = async (username, password, res) => {
@@ -166,9 +177,9 @@ const checkSession = async (req, res) => {
   }
   let session = await generalCrude.getRecordBy("sessions", "id", session_id);
 
-  if (!session) res.status(200).send(false);
-  else if (session.valid) res.status(200).send(true);
-  else res.status(200).send(false);
+    if (!session) res.status(200).send(false);
+    else if (session.valid) res.status(200).send(true);
+    else res.status(200).send(false);
 };
 
 const getUserByUsername = async (req, res) => {

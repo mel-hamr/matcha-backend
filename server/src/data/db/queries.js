@@ -75,7 +75,7 @@ const createTable = `
     type VARCHAR(255),
     text VARCHAR(255),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    is_read BOOLEAN
+    is_read BOOLEAN DAFAULT FALSE
   );
   CREATE TABLE IF NOT EXISTS "rating" (
     id SERIAL PRIMARY KEY,
