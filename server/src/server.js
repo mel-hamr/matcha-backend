@@ -1,7 +1,8 @@
 const express = require("express");
 const crud = require("./data/db/crud");
 const dataBase = require("./data/db/createDB");
-const userRouter = require("./routes/user/route");
+const userRouter = require("./routes/user/userRoute");
+const matchRouter = require("./routes/match/matchRoutes");
 const chatRouter = require("./routes/chat/chat");
 const browseRouter = require("./routes/browse/browse.router");
 const chatService = require("./services/chat/chat.service");
@@ -50,6 +51,7 @@ const io = require("socket.io")(httpServer, {
 
 // body parser
 app.use("/user", userRouter);
+app.use("/match", matchRouter);
 app.get("/", (req, res) => {
     // console.log(req.cookies);
     res.status(200).send({ name: "hello world" });
@@ -60,7 +62,7 @@ app.use("/notification", notificationRouter);
 app.post("/add", crud.createRecord);
 app.post("/update", crud.updateRecord);
 app.get("/start/intiate", async (req, res) => {
-    await dataBase.createDatabase();
+    // await dataBase.createDatabase();
     await dataBase.createTables();
     res.status(200).send("data base created succsesfully");
 });

@@ -30,6 +30,18 @@ const createTable = `
     view_id INT REFERENCES users(id),
     UNIQUE (user_id, view_id)
   );
+  CREATE TABLE IF NOT EXISTS "matchs" (
+    id SERIAL PRIMARY KEY,
+    user1_id INT REFERENCES users(id),
+    user2_id INT REFERENCES users(id),
+    UNIQUE (user1_id, user2_id)
+  );
+  CREATE TABLE IF NOT EXISTS "match_requests" (
+    id SERIAL PRIMARY KEY,
+    sender_id INT REFERENCES users(id),
+    reciver_id INT REFERENCES users(id),
+    UNIQUE (sender_id, reciver_id)
+  );
   CREATE TABLE IF NOT EXISTS sessions (
     id SERIAL PRIMARY KEY,
     user_id INT REFERENCES users(id),
@@ -65,15 +77,20 @@ const createTable = `
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     is_read BOOLEAN DAFAULT FALSE
   );
+  CREATE TABLE IF NOT EXISTS "rating" (
+    id SERIAL PRIMARY KEY,
+    rater_user_id INT REFERENCES users(id),
+    rated_user_id INT REFERENCES users(id),
+    rating INT NOT NULL CHECK (rating >= 1 AND rating <= 5),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 `;
 
-
-
 module.exports = {
-    checkDbExist,
-    createDb,
-    createTable,
-    checkDbExist,
-    createDb,
-    createTable,
+  checkDbExist,
+  createDb,
+  createTable,
+  checkDbExist,
+  createDb,
+  createTable,
 };

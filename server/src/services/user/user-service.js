@@ -105,111 +105,131 @@ const verifyUserEmail = async (userId, uniqueString, res) => {
 };
 
 const userLogin = async (username, password, res) => {
-    userRepo.getUserByUsernameOrEmail(username, username).then((user) => {
-        if (user) {
-            if (user.verified) {
-                bcrypt.compare(password, user.password).then(async (result) => {
-                    if (result) {
-                        let accessToken = auth.signJWT(
-                            {
-                                username: user.username,
-                                email_address: user.email_address,
-                                user_id: user.id,
-                            },
-                            "5m"
-                        );
-                        let session = await generalCrude.createRecord(
-                            {
-                                user_id: user.id,
-                                username: user.username,
-                                valid: true,
-                            },
-                            "sessions",
-                            res
-                        );
-                        // console.log(session);
-                        let refreshToken = auth.signJWT(
-                            { session_id: session.id },
-                            "1d"
-                        );
+  userRepo.getUserByUsernameOrEmail(username, username).then((user) => {
+    if (user) {
+      if (user.verified) {
+        bcrypt.compare(password, user.password).then(async (result) => {
+          if (result) {
+            let accessToken = auth.signJWT(
+              {
+                username: user.username,
+                email_address: user.email_address,
+                user_id: user.id,
+              },
+              "5m"
+            );
+            let session = await generalCrude.createRecord(
+              { user_id: user.id, username: user.username, valid: true },
+              "sessions",
+              res
+            );
+            let refreshToken = auth.signJWT({ session_id: session.id }, "1d");
 
-                        // set access token in cookie
-                        res.cookie("accessToken", accessToken, {
-                            maxAge: 300000, // 5 minutes
-                            httpOnly: true,
-                        });
-                        // set refresh token in cookie
-                        res.cookie("refreshToken", refreshToken, {
-                            maxAge: 60 * 60 * 24 * 1000, // 1 year
-                            httpOnly: true,
-                        });
-                        res.status(200).send({
-                            session: session,
-                            message: "user logged in successfully",
-                            signCompleteStatus: user.profile_completion_status,
-                        });
-                    } else {
-                        // console.log("invalid password");
-                        res.status(400).send("invalid username or password");
-                    }
-                });
-            } else {
-                console.log("user not verified");
-                res.status(400).send(
-                    "user not verified, please check your email"
-                );
-            }
-        } else {
-            console.log("invalid username ");
+            res.cookie("accessToken", accessToken, {
+              maxAge: 300000, // 5 minutes
+              httpOnly: true,
+            });
+            res.cookie("refreshToken", refreshToken, {
+              maxAge: 60 * 60 * 24 * 1000, // 1 year
+              httpOnly: true,
+            });
+            res.status(200).send({
+              session: session,
+              message: "user logged in successfully",
+              signCompleteStatus: user.profile_completion_status,
+            });
+          } else {
+            console.log("invalid password");
             res.status(400).send("invalid username or password");
-        }
-    });
+          }
+        });
+      } else {
+        console.log("user not verified");
+        res.status(400).send("user not verified, please check your email");
+      }
+    } else {
+      console.log("invalid username ");
+      res.status(400).send("invalid username or password");
+    }
+  });
 };
 
 const completeSignup = async (req, res, completeSignupDTO) => {
-    let user = await generalCrude.getRecordBy(
-        "users",
-        "username",
-        req.user.username
-    );
-    if (!user) {
-        res.status(400).send("user not found");
-        return;
-    }
-    let updateUserDTO =
-        userMapper.mapCompleteSingupDTOToUpdateUserDTO(completeSignupDTO);
-    generalCrude.updateRecord("users", user.id, updateUserDTO);
-    res.status(200).send({ message: "user updated successfully" });
+  let user = await generalCrude.getRecordBy(
+    "users",
+    "username",
+    req.session.username
+  );
+  if (!user) {
+    res.status(400).send("user not found");
+    return;
+  }
+  let updateUserDTO =
+    userMapper.mapCompleteSingupDTOToUpdateUserDTO(completeSignupDTO);
+  generalCrude.updateRecord("users", user.id, updateUserDTO);
+  res.status(200).send({ message: "user updated successfully" });
 };
 
 const checkSession = async (req, res) => {
-    let session_id = req.query.session_id;
-    if (
-        !session_id ||
-        (!req.cookies.accessToken && !req.cookies.refreshToken)
-    ) {
-        return res.status(200).send(false);
-    }
-    let session = await generalCrude.getRecordBy("sessions", "id", session_id);
-    // console.log(session);
+  let session_id = req.query.session_id;
+  if (!session_id || (!req.cookies.accessToken && !req.cookies.refreshToken)) {
+    return res.status(200).send(false);
+  }
+  let session = await generalCrude.getRecordBy("sessions", "id", session_id);
 
     if (!session) res.status(200).send(false);
     else if (session.valid) res.status(200).send(true);
     else res.status(200).send(false);
 };
 
-const getUserByUsername = async (res, username) => {
-    const user = await generalCrude.getRecordBy("users", "username", username);
-    // console.log(user);
-    if (!user) res.status(400).send("user not found");
-    else res.status(200).send(user);
+const getUserByUsername = async (req, res) => {
+  const user = await userRepo.getUserByUsername(req.query.username);
+  const userRating = await userRepo.getRatingByRaterAndRated(
+    req.session.user_id,
+    user.id
+  );
+  let result = { user: user, rating: { exist: false, rating: 0 } };
+
+  if (userRating) result.rating = { exist: true, rating: userRating.rating };
+
+  if (!user) res.status(400).send("user not found");
+  else res.status(200).send(result);
+};
+
+const rateUser = async (req, res) => {
+  const user = await generalCrude.getRecordBy(
+    "users",
+    "id",
+    req.body.rated_user_id
+  );
+  if (user) {
+    const rating = await userRepo.getRatingByRaterAndRated(
+      req.session.user_id,
+      req.body.rated_user_id
+    );
+    if (rating) {
+      const newRating = await userRepo.updateUserRating(
+        req.body.rating,
+        rating.id
+      );
+      res.status(200).send(newRating);
+    } else {
+      const newRating = await userRepo.ceateRateUserRecord(
+        req.session.user_id,
+        req.body.rated_user_id,
+        req.body.rating
+      );
+      res.status(200).send(newRating);
+    }
+  } else res.status(400).send("user not found");
 };
 
 module.exports = {
-    userSignIn,
-    verifyUserEmail,
-    userLogin,
-    completeSignup,
-    checkSession,
-    getUserByUsername,
+  userSignIn,
+  verifyUserEmail,
+  userLogin,
+  completeSignup,
+  checkSession,
+  getUserByUsername,
+  rateUser,
 };

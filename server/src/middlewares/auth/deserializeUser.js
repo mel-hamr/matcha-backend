@@ -6,36 +6,39 @@ async function deserializeUser(req, res, next) {
 
     const { accessToken, refreshToken } = req.cookies;
 
-    if (!accessToken && !refreshToken) {
-        return res.status(401).send("unauthorized");
-    } else {
-        if (accessToken) {
-            const { payload, expired } = verifyJWT(accessToken);
-            if (expired == false && payload) {
-                req.user = payload;
-                return next();
-            }
-        }
+  if (!accessToken && !refreshToken) {
+    return res.status(401).send("unauthorized");
+  }
+  else {
 
-        if (!accessToken || (expired == true && refreshToken)) {
-            const decodedRefreshToken = verifyJWT(refreshToken);
-            if (decodedRefreshToken.expired == true) {
-                return res.status(401).send("unauthorized");
-            }
-            const session = await generalCrude.getRecordById(
-                "sessions",
-                decodedRefreshToken.payload.session_id
-            );
-            if (!session || !session.valid) {
-                return res.status(401).send("unauthorized");
-            }
-            const newAccessToken = signJWT(session, "5m");
-            res.cookie("accessToken", newAccessToken, {
-                maxAge: 300000,
-                httpOnly: true,
-            });
-            req.user = verifyJWT(newAccessToken).payload;
+    if (accessToken) {
+      const { payload, expired } = verifyJWT(accessToken);
+      if (expired == false && payload) 
+      {
+        req.session = payload;
+        return next();
+      }
+    }
+    
+    if (!accessToken || (expired == true && refreshToken)) {
+      const decodedRefreshToken = verifyJWT(refreshToken);
+      if (decodedRefreshToken.expired == true) {
+        return res.status(401).send("unauthorized");
+      }
+      const session = await generalCrude.getRecordById(
+        "sessions",
+        decodedRefreshToken.payload.session_id
+        );
+        if (!session || !session.valid) {
+          return res.status(401).send("unauthorized");
         }
+        const newAccessToken = signJWT(session, "5m");
+        res.cookie("accessToken", newAccessToken, {
+          maxAge: 300000,
+          httpOnly: true,
+        });
+        req.session = verifyJWT(newAccessToken).payload;
+      }
 
         return next();
     }
