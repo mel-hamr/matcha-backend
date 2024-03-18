@@ -14,7 +14,7 @@ async function deserializeUser(req, res, next) {
       const { payload, expired } = verifyJWT(accessToken);
       if (expired == false && payload) 
       {
-        req.user = payload;
+        req.session = payload;
         return next();
       }
     }
@@ -36,7 +36,7 @@ async function deserializeUser(req, res, next) {
           maxAge: 300000,
           httpOnly: true,
         });
-        req.user = verifyJWT(newAccessToken).payload;
+        req.session = verifyJWT(newAccessToken).payload;
       }
 
       return next();

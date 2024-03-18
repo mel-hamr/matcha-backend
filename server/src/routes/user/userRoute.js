@@ -13,9 +13,9 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
 ////// imagekit
-console.log("image kit url", process.env.IMAGE_KIT_URL);
-console.log("image kit public key", process.env.IMAGE_KIT_PUBLIC_KEY);
-console.log("image kit private key", process.env.IMAGE_KIT_PRIVATE_KEY);
+// console.log("image kit url", process.env.IMAGE_KIT_URL);
+// console.log("image kit public key", process.env.IMAGE_KIT_PUBLIC_KEY);
+// console.log("image kit private key", process.env.IMAGE_KIT_PRIVATE_KEY);
 var ImageKit = require("imagekit");
 
 var imagekit = new ImageKit({
@@ -99,7 +99,7 @@ router.post("/completeSignupStatus", async (req, res) => {
   let user = await generalCrude.getRecordBy(
     "users",
     "username",
-    req.user.username
+    req.session.username
   );
   if (!user) {
     res.status(400).send("user not found");
@@ -114,7 +114,12 @@ router.get("/checkSession", async (req, res) => {
 });
 
 router.get("/", (req, res) => {
-  userSerivce.getUserByUsername(res, req.query.username);
+  userSerivce.getUserByUsername(req, res);
+});
+
+router.post("/rate", async (req, res) => {
+  userSerivce.rateUser(req, res);
+  // res.status(200).send("rate called");
 });
 
 module.exports = router;
