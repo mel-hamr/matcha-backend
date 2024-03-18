@@ -112,15 +112,12 @@ const userLogin = async (username, password, res) => {
               "sessions",
               res
             );
-            console.log(session);
             let refreshToken = auth.signJWT({ session_id: session.id }, "1d");
 
-            // set access token in cookie
             res.cookie("accessToken", accessToken, {
               maxAge: 300000, // 5 minutes
               httpOnly: true,
             });
-            // set refresh token in cookie
             res.cookie("refreshToken", refreshToken, {
               maxAge: 60 * 60 * 24 * 1000, // 1 year
               httpOnly: true,
@@ -150,7 +147,7 @@ const completeSignup = async (req, res, completeSignupDTO) => {
   let user = await generalCrude.getRecordBy(
     "users",
     "username",
-    req.user.username
+    req.session.username
   );
   if (!user) {
     res.status(400).send("user not found");
@@ -164,23 +161,57 @@ const completeSignup = async (req, res, completeSignupDTO) => {
 
 const checkSession = async (req, res) => {
   let session_id = req.query.session_id;
-  if (!session_id || !req.cookies.accessToken && !req.cookies.refreshToken) {
+  if (!session_id || (!req.cookies.accessToken && !req.cookies.refreshToken)) {
     return res.status(200).send(false);
   }
   let session = await generalCrude.getRecordBy("sessions", "id", session_id);
-  // console.log(session);
 
   if (!session) res.status(200).send(false);
   else if (session.valid) res.status(200).send(true);
   else res.status(200).send(false);
 };
 
-const getUserByUsername = async (res, username) => {
-  const user = await generalCrude.getRecordBy("users", "username", username);
-  // console.log(user);
+const getUserByUsername = async (req, res) => {
+  const user = await userRepo.getUserByUsername(req.query.username);
+  const userRating = await userRepo.getRatingByRaterAndRated(
+    req.session.user_id,
+    user.id
+  );
+  let result = { user: user, rating: { exist: false, rating: 0 } };
+
+  if (userRating) result.rating = { exist: true, rating: userRating.rating };
+
   if (!user) res.status(400).send("user not found");
-  else res.status(200).send(user);
-};             
+  else res.status(200).send(result);
+};
+
+const rateUser = async (req, res) => {
+  const user = await generalCrude.getRecordBy(
+    "users",
+    "id",
+    req.body.rated_user_id
+  );
+  if (user) {
+    const rating = await userRepo.getRatingByRaterAndRated(
+      req.session.user_id,
+      req.body.rated_user_id
+    );
+    if (rating) {
+      const newRating = await userRepo.updateUserRating(
+        req.body.rating,
+        rating.id
+      );
+      res.status(200).send(newRating);
+    } else {
+      const newRating = await userRepo.ceateRateUserRecord(
+        req.session.user_id,
+        req.body.rated_user_id,
+        req.body.rating
+      );
+      res.status(200).send(newRating);
+    }
+  } else res.status(400).send("user not found");
+};
 
 module.exports = {
   userSignIn,
@@ -189,4 +220,5 @@ module.exports = {
   completeSignup,
   checkSession,
   getUserByUsername,
+  rateUser,
 };

@@ -2,8 +2,8 @@ const client = require("./createDB");
 const matchaPool = client.matchaPool;
 
 
-const createRecord = async (user, table) => {
-  const data = user;
+const createRecord = async (object , table) => {
+  const data = object;
   const columns = Object.keys(data).join(", ");
   const values = Object.values(data);
   const placeholders = values.map((_, i) => `$${i + 1}`).join(", ");

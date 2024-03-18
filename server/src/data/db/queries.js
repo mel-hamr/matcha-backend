@@ -77,15 +77,20 @@ const createTable = `
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     is_read BOOLEAN
   );
+  CREATE TABLE IF NOT EXISTS "rating" (
+    id SERIAL PRIMARY KEY,
+    rater_user_id INT REFERENCES users(id),
+    rated_user_id INT REFERENCES users(id),
+    rating INT NOT NULL CHECK (rating >= 1 AND rating <= 5),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 `;
 
-
-
 module.exports = {
-    checkDbExist,
-    createDb,
-    createTable,
-    checkDbExist,
-    createDb,
-    createTable,
+  checkDbExist,
+  createDb,
+  createTable,
+  checkDbExist,
+  createDb,
+  createTable,
 };
