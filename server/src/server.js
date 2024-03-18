@@ -74,6 +74,21 @@ io.on("connection", (socket) => {
     // socket id
     socket.join(socket.handshake.query.roomID.toString());
 
+    // connected users
+    socket.on("connectedUsersForSpecificUser", (data) => {
+        connectedUsers = [];
+        userId = data.userId;
+        userFriendsIds = data.userFriendsIds;
+
+        userFriendsIds.forEach((id) => {
+            // check if user is online
+            if (io.sockets.adapter.rooms.get(id.toString()) !== undefined) {
+                connectedUsers.push(id);
+            }
+        });
+        socket.emit("connectedUsers", connectedUsers);
+    });
+
     socket.on("sendFriendMessage", (message) => {
         if (
             message.sender_id !== undefined &&
@@ -109,7 +124,6 @@ io.on("connection", (socket) => {
     });
 
     socket.on("userVisited", (data) => {
-   
         // viewProfileFriend { userId: 8, userName: 'Thor' }
         notificationService.addNotification(
             data.userId,

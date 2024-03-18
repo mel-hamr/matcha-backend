@@ -17,6 +17,7 @@ const saveConvertaion = async (message) => {
             Participant_a: message.sender_id,
             Participant_b: message.receiver_id,
             last_message: message.message,
+            date: message.date,
             is_read: false,
             unread_messages: 0,
         };
@@ -27,6 +28,7 @@ const saveConvertaion = async (message) => {
             conversationExist.rows[0].id,
             {
                 last_message: message.message,
+                date: message.date,
                 is_read: false,
                 unread_messages: conversationExist.rows[0].unread_messages + 1,
             }

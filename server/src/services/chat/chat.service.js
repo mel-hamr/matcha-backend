@@ -41,10 +41,10 @@ const getConversations = async (userID) => {
         avatar: conversation.avatar,
         user_id: conversation.user_id,
         lastMessage: conversation.last_message,
-        date: calculateDate(conversation.date),
+        date: conversation.date,
+        timeAgo: calculateDate(conversation.date),
         isRead: conversation.is_read,
     }));
-
     // console.log(updatedConversations);
     return updatedConversations;
 };
